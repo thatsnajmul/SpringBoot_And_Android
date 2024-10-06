@@ -3,6 +3,8 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,16 +18,16 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
+
         setContentView(R.layout.activity_splash);
-        // Delay before launching the main activity
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                // Start the main activity
                 Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                 startActivity(intent);
-                finish(); // Close splash activity
+                finish();
             }
-        }, 3000); // 3 seconds delay
+        }, 3000);
     }
 }

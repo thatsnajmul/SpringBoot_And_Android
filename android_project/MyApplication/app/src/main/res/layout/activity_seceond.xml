@@ -172,15 +172,13 @@
                 android:text="@string/lorem"
                 android:textSize="20sp"
                 android:textColor="@color/purple_200"
+
                 />
 
 
 
         </LinearLayout>
-
-
-
-
+        
 
     </ScrollView>
 
@@ -191,25 +189,29 @@
         android:orientation="horizontal"
         android:gravity="center"
         android:layout_alignParentBottom="true"
-        android:padding="10dp">
+        android:padding="10dp"
+        >
 
         <Button
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Button 1"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:layout_margin="5dp"/>
 
         <Button
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Button 2"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:layout_margin="5dp"/>
 
         <Button
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Button 3"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:layout_margin="5dp"/>
     </LinearLayout>
 
 

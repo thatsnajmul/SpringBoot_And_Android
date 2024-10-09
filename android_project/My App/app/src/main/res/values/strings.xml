@@ -2,8 +2,7 @@
     <string name="app_name">My App</string>
 
     <!-- to toggle the open close button of the navigation drawer -->
-    <string name="nav_open">Open</string>
-    <string name="nav_close">Close</string>
-
+        <string name="open_nav">Open Navigation Drawer</string>
+        <string name="close_nav">Close Navigation Drawer</string>
 
 </resources>

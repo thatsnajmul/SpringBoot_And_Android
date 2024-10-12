@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "707618702868",
+    "project_id": "user-login-and-logout-de941",
+    "storage_bucket": "user-login-and-logout-de941.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:707618702868:android:517ecea336aa92460c8901",
+        "android_client_info": {
+          "package_name": "com.thatsnajmul.userloginandlogout"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAk_1-7YyoFN1mBMbf4-2VXG5Tu7XUpRQs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -16,7 +16,7 @@ public class WebViewActivity extends AppCompatActivity {
 
         webView = findViewById(R.id.webView);
         webView.setWebViewClient(new WebViewClient());
-        webView.loadUrl("https://www.yourwebsite.com"); // Replace with your URL
+        webView.loadUrl("https://careerhub.isdb-bisew.info/TraineeOnlineFeedBack"); // Replace with your URL
     }
 
     @Override

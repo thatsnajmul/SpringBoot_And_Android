@@ -32,6 +32,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.text.DateFormat;
+import java.util.Calendar;
+
 public class UploadActivity extends AppCompatActivity {
 
     ImageView uploadImage;
@@ -86,7 +89,7 @@ public class UploadActivity extends AppCompatActivity {
     }
 
     public void saveData() {
-        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Android Images")
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Najmul Images")
                 .child(uri.getLastPathSegment());
 
         AlertDialog.Builder builder = new AlertDialog.Builder(UploadActivity.this);
@@ -119,6 +122,9 @@ public class UploadActivity extends AppCompatActivity {
         String lang = uploadLang.getText().toString();
 
         DataClass dataClass = new DataClass(title, desc, lang, imageUrl);
+
+
+        String currentDate = DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
 
         FirebaseDatabase.getInstance().getReference("Najmul Data").child(title)
                 .setValue(dataClass).addOnCompleteListener(new OnCompleteListener<Void>() {

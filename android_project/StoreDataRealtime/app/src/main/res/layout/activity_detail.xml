@@ -33,6 +33,16 @@
             android:scaleType="fitXY" />
 
         <TextView
+            android:id="@+id/detailLang"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="20dp"
+            android:text="Language"
+            android:textSize="18sp"
+            android:textColor="@color/lavender" />
+
+        <TextView
             android:id="@+id/detailDesc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -41,6 +51,44 @@
             android:text="Description"
             android:textSize="18sp"
             android:textColor="@color/lavender" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <com.github.clans.fab.FloatingActionMenu
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                app:menu_fab_size="normal"
+                android:layout_marginBottom="20dp"
+                android:layout_marginEnd="20dp"
+                app:menu_colorPressed="@color/lavender"
+                app:menu_colorNormal="@color/lavender"
+                app:menu_icon="@drawable/baseline_checklist_24"
+                app:menu_openDirection="up"
+                app:menu_showShadow="true">
+
+                <com.github.clans.fab.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/editButton"
+                    android:src="@drawable/edit"
+                    app:fab_showShadow="true"
+                    app:fab_colorNormal="@color/green"
+                    app:fabSize="mini"/>
+
+                <com.github.clans.fab.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/deleteButton"
+                    android:src="@drawable/baseline_delete_24"
+                    app:fab_showShadow="true"
+                    app:fab_colorNormal="@color/red"
+                    app:fabSize="mini"/>
+
+            </com.github.clans.fab.FloatingActionMenu>
+        </RelativeLayout>
 
     </LinearLayout>
 </ScrollView>

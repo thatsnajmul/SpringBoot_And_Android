@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.example.storedatarealtime.app-mergeDebugResources-35:/values-v18/values-v18.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\thatsnajmul\\.gradle\\caches\\8.9\\transforms\\276cdcd47265c572f1135cfe2f7b52af\\transformed\\appcompat-1.6.1\\res\\values-v18\\values-v18.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "48",
+                        "endOffsets": "99"
+                    }
+                }
+            ]
+        }
+    ]
+}

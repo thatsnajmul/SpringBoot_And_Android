@@ -29,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
     private void setupToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar); // Link to the toolbar in your layout
         setSupportActionBar(toolbar); // Set the custom toolbar as the ActionBar
-        setSupportActionBar(toolbar);  // Use only if no default action bar
     }
 
     @Override

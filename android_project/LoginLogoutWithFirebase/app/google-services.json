@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "521835804101",
+    "project_id": "login-logout-with-firebase",
+    "storage_bucket": "login-logout-with-firebase.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:521835804101:android:8e6c72ef87450bef6147ac",
+        "android_client_info": {
+          "package_name": "com.thatsnajmul.loginlogoutwithfirebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDID9li8xbRa96Dv1B0mxAEWJseuTOpdP0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

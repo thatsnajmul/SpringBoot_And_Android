@@ -45,7 +45,7 @@
             android:layout_toEndOf="@id/recTitle"
             android:text="Language"
             android:textColor="@color/lavender"
-            android:textSize="8sp"
+            android:textSize="18sp"
             android:textAlignment="center"/>
 
         <TextView

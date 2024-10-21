@@ -149,19 +149,52 @@ public class NotesActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu with the logout option
         getMenuInflater().inflate(R.menu.menu, menu);
+
+        // Get current user email from Firebase
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseUser != null) {
+            String userEmail = firebaseUser.getEmail();
+
+            // Dynamically add the user's email to the menu above the "Logout" option
+            if (userEmail != null) {
+                menu.add(Menu.NONE, Menu.NONE, 0, "Logged in as: " + userEmail)
+                        .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER); // Show email in the overflow menu
+            }
+        }
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.logout) {
-            firebaseAuth.signOut();
+            // Handle logout action
+            FirebaseAuth.getInstance().signOut();
             finish();
             startActivity(new Intent(NotesActivity.this, MainActivity.class));
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.menu, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+//        if (item.getItemId() == R.id.logout) {
+//            firebaseAuth.signOut();
+//            finish();
+//            startActivity(new Intent(NotesActivity.this, MainActivity.class));
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
 
     @Override
     protected void onStart() {
@@ -173,7 +206,7 @@ public class NotesActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         if (noteAdapter != null) {
-            noteAdapter.stopListening();
+            noteAdapter.startListening();
         }
     }
 
@@ -195,9 +228,6 @@ public class NotesActivity extends AppCompatActivity {
         return colorcode.get(number);
     }
 }
-
-
-
 
 
 //package com.example.notesapp;

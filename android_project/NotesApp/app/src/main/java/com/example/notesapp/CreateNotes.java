@@ -225,12 +225,21 @@ public class CreateNotes extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressLint("MissingSuperCall")
     @Override
     public void onBackPressed() {
-        // Trigger the save action when back is pressed
-        saveNote();
+        // Check if the fields are empty
+        String title = mcreatetitleofnote.getText().toString().trim();
+        String content = mcreatecontentofnote.getText().toString().trim();
+
+        if (title.isEmpty() && content.isEmpty()) {
+            // If both fields are empty, just navigate back
+            super.onBackPressed();
+        } else {
+            // If fields are not empty, save the note
+            saveNote();
+        }
     }
+
 }
 
 

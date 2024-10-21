@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="8dp"
+        android:radius="12dp"
+        android:layout_margin="8dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp"
+        android:id="@+id/notecard">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/note"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+               >
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/notetitle"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:text="This is your developer"
+                    android:textColor="@color/black"
+                    android:layout_weight="1" />
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:id="@+id/menupopbutton"
+                    android:layout_marginRight="10dp"
+                    android:src="@drawable/vert"
+                    android:contentDescription="More options" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/notecontent"
+                android:paddingTop="10dp"
+                android:paddingBottom="20dp"
+                android:text="This is your code which appears here"
+                android:textSize="16sp"
+                android:textColor="@color/black" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>
+
+
+
+
+    <!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    android:padding="15dp">-->
+<!--    -->
+<!--    -->
+<!--    <androidx.cardview.widget.CardView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:elevation="5dp"-->
+<!--        app:cardMaxElevation="5dp"-->
+<!--        android:id="@+id/notecard"-->
+<!--        >-->
+<!--        -->
+<!--        -->
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:id="@+id/note"-->
+<!--            android:orientation="vertical"-->
+<!--            android:background="#F8F7F7">-->
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:orientation="horizontal"-->
+<!--                android:background="#F8F7F7"-->
+<!--                >-->
+<!--                <TextView-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:id="@+id/notetitle"-->
+<!--                    android:paddingTop="10dp"-->
+<!--                    android:paddingRight="10dp"-->
+<!--                    android:paddingLeft="10dp"-->
+<!--                    android:paddingBottom="10dp"-->
+<!--                    android:textSize="20sp"-->
+<!--                    android:textStyle="bold"-->
+<!--                    android:text="This is your developer"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:layout_weight="1"-->
+
+<!--                    />-->
+<!--                <ImageView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:id="@+id/menupopbutton"-->
+<!--                    android:layout_weight="0"-->
+<!--                    android:src="@drawable/vert"/>-->
+<!--            </LinearLayout>-->
+
+<!--            <TextView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:id="@+id/notecontent"-->
+<!--                android:paddingBottom="20dp"-->
+<!--                android:paddingLeft="10dp"-->
+<!--                android:paddingRight="10dp"-->
+<!--                android:paddingTop="10dp"-->
+<!--                android:text="This is your code which appear here"-->
+<!--                android:textSize="15sp"-->
+<!--                android:textColor="#FF5722"-->
+
+<!--                />-->
+
+<!--        </LinearLayout>-->
+<!--        -->
+<!--    </androidx.cardview.widget.CardView>-->
+
+<!--</RelativeLayout>-->

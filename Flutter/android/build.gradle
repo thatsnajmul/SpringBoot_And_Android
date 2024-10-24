@@ -6,6 +6,11 @@ allprojects {
 }
 
 rootProject.buildDir = "../build"
+
+android {
+    dynamicFeatures = [':dynamicfeature']
+}
+
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }

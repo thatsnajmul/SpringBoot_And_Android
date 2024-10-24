@@ -3,6 +3,9 @@ package com.thatsnajmull.job_search.model;
 public class Job {
 
     private long id;
+
+    //private companyemail;
+    //private companyphone;
     private String jobTitle;
     private String description;
     private String requirements;

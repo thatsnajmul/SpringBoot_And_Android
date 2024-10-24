@@ -10,6 +10,9 @@ public class JobEntity {
     @Id
     @GeneratedValue
     private long id;
+
+    //private companyemail;
+    //private companyphone;
     private String jobTitle;
     private String description;
     private String requirements;

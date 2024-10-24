@@ -7,7 +7,7 @@ class SignUpPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sign Up Page'),
+        //title: Text('Sign Up Page'),
       ),
       body: SignUpForm(),
     );
@@ -52,7 +52,7 @@ class _SignUpFormState extends State<SignUpForm> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(25.0),
+      padding: EdgeInsets.all(16.0),
       child: Form(
         key: _formKey,
         child: ListView(
@@ -314,18 +314,15 @@ class _SignUpFormState extends State<SignUpForm> {
             ),
             SizedBox(height: 16),
 
-            GestureDetector(
-              onTap: () {
-                // Navigate to Login Page
+            TextButton(
+              onPressed: () {
+                // Navigate to the SignUpPage
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => LoginPage()),
                 );
               },
-              child: Text(
-                'Already have an account? Login',
-                style: TextStyle(color: Colors.blue),
-              ),
+              child: Text('Already have an account! Want to Lon In?'),
             ),
           ],
         ),

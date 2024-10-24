@@ -1,28 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertest/LoginPage.dart';
 
-void main() {
-  runApp(MyApp());
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Bike Race Game',
-      debugShowCheckedModeBanner: false,  // Disable the debug banner
+      title: 'Login Page',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Bike Race Game'),
-        ),
-        body: Center(
-          child: Image.asset('assets/bike.png'),
-        ),
-      ),
+      debugShowCheckedModeBanner: false,
+      home: LoginPage(),
     );
   }
 }
+

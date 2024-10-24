@@ -24,27 +24,27 @@ class _SignUpFormState extends State<SignUpForm> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
-
-  // New controllers for the additional fields
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
-
-  // Date of Birth Controller
   final TextEditingController _dobController = TextEditingController();
+  final TextEditingController _cellController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+
+  String? _gender; // Variable to hold the selected gender
 
   // Function to open the date picker and set the selected date
   Future<void> _selectDate(BuildContext context) async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime(2000), // Set the initial date to a reasonable default
-      firstDate: DateTime(1900), // Set the earliest date a user can pick
-      lastDate: DateTime.now(), // Set the latest date to today
+      initialDate: DateTime(2000),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
     );
 
     if (pickedDate != null) {
       setState(() {
-        _dobController.text = DateFormat('yyyy-MM-dd').format(pickedDate); // Format the selected date
+        _dobController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
       });
     }
   }
@@ -52,7 +52,7 @@ class _SignUpFormState extends State<SignUpForm> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(25.0),
       child: Form(
         key: _formKey,
         child: ListView(
@@ -69,7 +69,7 @@ class _SignUpFormState extends State<SignUpForm> {
               decoration: InputDecoration(
                 labelText: 'Name',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.person),  // Name prefix icon
+                prefixIcon: Icon(Icons.person),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -83,13 +83,13 @@ class _SignUpFormState extends State<SignUpForm> {
             // Date of Birth field with Date Picker
             TextFormField(
               controller: _dobController,
-              readOnly: true, // Prevent keyboard from showing up
+              readOnly: true,
               decoration: InputDecoration(
                 labelText: 'Date of Birth',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.calendar_today),  // DOB prefix icon
+                prefixIcon: Icon(Icons.calendar_today),
               ),
-              onTap: () => _selectDate(context), // Open the date picker when the field is tapped
+              onTap: () => _selectDate(context),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please select your date of birth';
@@ -105,7 +105,7 @@ class _SignUpFormState extends State<SignUpForm> {
               decoration: InputDecoration(
                 labelText: 'City',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.location_city),  // City prefix icon
+                prefixIcon: Icon(Icons.location_city),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -122,7 +122,7 @@ class _SignUpFormState extends State<SignUpForm> {
               decoration: InputDecoration(
                 labelText: 'Location',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.location_on),  // Location prefix icon
+                prefixIcon: Icon(Icons.location_on),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -133,13 +133,117 @@ class _SignUpFormState extends State<SignUpForm> {
             ),
             SizedBox(height: 16),
 
+            // Cell Number field
+            TextFormField(
+              controller: _cellController,
+              decoration: InputDecoration(
+                labelText: 'Cell Number',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.phone),
+              ),
+              keyboardType: TextInputType.phone,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your cell number';
+                }
+                if (!RegExp(r'^[0-9]{10}$').hasMatch(value)) {
+                  return 'Please enter a valid cell number';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 16),
+
+            // Address field
+            TextFormField(
+              controller: _addressController,
+              decoration: InputDecoration(
+                labelText: 'Address',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.home),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your address';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 16),
+
+            // Gender field with Radio buttons and icons
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+              ),
+              padding: EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Gender:', style: TextStyle(fontSize: 16)),
+                  Wrap(
+                    spacing: 16.0, // Space between radio buttons
+                    children: [
+                      Row(
+                        children: [
+                          Radio<String>(
+                            value: 'Male',
+                            groupValue: _gender,
+                            onChanged: (value) {
+                              setState(() {
+                                _gender = value;
+                              });
+                            },
+                          ),
+                          Icon(Icons.male),
+                          Text('Male'),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Radio<String>(
+                            value: 'Female',
+                            groupValue: _gender,
+                            onChanged: (value) {
+                              setState(() {
+                                _gender = value;
+                              });
+                            },
+                          ),
+                          Icon(Icons.female),
+                          Text('Female'),
+
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Radio<String>(
+                            value: 'Other',
+                            groupValue: _gender,
+                            onChanged: (value) {
+                              setState(() {
+                                _gender = value;
+                              });
+                            },
+                          ),
+                          Icon(Icons.transgender),
+                          Text('Other'),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 16),
+
             // Email field
             TextFormField(
               controller: _emailController,
               decoration: InputDecoration(
                 labelText: 'Email',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.email),  // Email prefix icon
+                prefixIcon: Icon(Icons.email),
               ),
               keyboardType: TextInputType.emailAddress,
               validator: (value) {
@@ -160,7 +264,7 @@ class _SignUpFormState extends State<SignUpForm> {
               decoration: InputDecoration(
                 labelText: 'Password',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.lock),  // Password prefix icon
+                prefixIcon: Icon(Icons.lock),
               ),
               obscureText: true,
               validator: (value) {
@@ -178,7 +282,7 @@ class _SignUpFormState extends State<SignUpForm> {
               decoration: InputDecoration(
                 labelText: 'Confirm Password',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.lock_outline),  // Confirm Password prefix icon
+                prefixIcon: Icon(Icons.lock_outline),
               ),
               obscureText: true,
               validator: (value) {
@@ -198,23 +302,30 @@ class _SignUpFormState extends State<SignUpForm> {
                   print('Date of Birth: ${_dobController.text}');
                   print('City: ${_cityController.text}');
                   print('Location: ${_locationController.text}');
+                  print('Cell: ${_cellController.text}');
+                  print('Address: ${_addressController.text}');
+                  print('Gender: $_gender');
                   print('Email: ${_emailController.text}');
                   print('Password: ${_passwordController.text}');
+                  // TODO: Implement sign up functionality
                 }
               },
               child: Text('Sign Up'),
             ),
-            SizedBox(height: 20,),
+            SizedBox(height: 16),
 
-            TextButton(
-              onPressed: () {
-                // Navigate to the LoginPage
+            GestureDetector(
+              onTap: () {
+                // Navigate to Login Page
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => LoginPage()),
                 );
               },
-              child: Text('Already have an account? Want to login?'),
+              child: Text(
+                'Already have an account? Login',
+                style: TextStyle(color: Colors.blue),
+              ),
             ),
           ],
         ),

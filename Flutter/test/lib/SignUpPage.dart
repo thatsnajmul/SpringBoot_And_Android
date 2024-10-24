@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertest/LoginPage.dart';
+import 'package:intl/intl.dart'; // For formatting date
 
 class SignUpPage extends StatelessWidget {
   @override
@@ -26,9 +27,27 @@ class _SignUpFormState extends State<SignUpForm> {
 
   // New controllers for the additional fields
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _dobController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
+
+  // Date of Birth Controller
+  final TextEditingController _dobController = TextEditingController();
+
+  // Function to open the date picker and set the selected date
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime(2000), // Set the initial date to a reasonable default
+      firstDate: DateTime(1900), // Set the earliest date a user can pick
+      lastDate: DateTime.now(), // Set the latest date to today
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        _dobController.text = DateFormat('yyyy-MM-dd').format(pickedDate); // Format the selected date
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,18 +80,19 @@ class _SignUpFormState extends State<SignUpForm> {
             ),
             SizedBox(height: 16),
 
-            // Date of Birth field
+            // Date of Birth field with Date Picker
             TextFormField(
               controller: _dobController,
+              readOnly: true, // Prevent keyboard from showing up
               decoration: InputDecoration(
                 labelText: 'Date of Birth',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.calendar_today),  // DOB prefix icon
               ),
-              keyboardType: TextInputType.datetime,
+              onTap: () => _selectDate(context), // Open the date picker when the field is tapped
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter your date of birth';
+                  return 'Please select your date of birth';
                 }
                 return null;
               },

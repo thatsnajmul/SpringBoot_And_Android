@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:job/addJob.dart';
-
 import 'ViewJob.dart';
 
-class jobDrawer extends StatefulWidget {
+class JobDrawer extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     return JobDrawerState();
   }
 }
 
-class JobDrawerState extends State<jobDrawer> {
+class JobDrawerState extends State<JobDrawer> {
   final double minimumPadding = 5.0;
 
   @override
@@ -19,7 +18,7 @@ class JobDrawerState extends State<jobDrawer> {
       appBar: AppBar(
         title: Text('Job'),
       ),
-      body: Center(child: Text('Welcome to Job Search')),
+      body: ViewJob(), // Set ViewJob as the initial body content
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.only(top: minimumPadding, bottom: minimumPadding),
@@ -31,18 +30,18 @@ class JobDrawerState extends State<jobDrawer> {
               ),
             ),
             ListTile(
-              title: Text('Add Job'), // Add the title you want
+              title: Text('Add Job'),
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> AddJob()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => AddJob()));
               },
             ),
             ListTile(
-              title: Text('View Job'), // Add the title you want
+              title: Text('View Job'),
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> ViewJob()));
+                // Navigates to ViewJob page, if you want a separate page instance
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ViewJob()));
               },
             ),
-            // Add more ListTile widgets as needed
           ],
         ),
       ),

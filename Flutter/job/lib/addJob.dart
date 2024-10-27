@@ -26,27 +26,30 @@ class AddJobState extends State<AddJob> {
   Future<void> _submitJob() async {
     if (_formKey.currentState?.validate() == true) {
       final jobData = {
-        'job_title': jobTitleController.text,
+        'jobTitle': jobTitleController.text,
         'description': descriptionController.text,
         'requirements': requirementsController.text,
         'location': locationController.text,
         'salary': double.tryParse(salaryController.text) ?? 0.0,
-        'job_type': jobTypeController.text,
+        'jobType': jobTypeController.text,
         'position': positionController.text,
         'skills': skillsController.text,
-        'company_name': companyNameController.text,
+        'companyName': companyNameController.text,
       };
+
+      // Debug print to verify jobData content
+      print("Job Data to be sent: $jobData");
 
       try {
         final response = await http.post(
-          Uri.parse('http://192.168.0.1:8080/addjob'), // Update with your API URL
+          Uri.parse('http://localhost:8080/addjob'), // Update with your API URL
           headers: {'Content-Type': 'application/json'},
           body: json.encode(jobData),
         );
-
-        if (response.statusCode == 200) {
+        if (response.statusCode == 200 || response.statusCode == 201) {
           Navigator.pop(context); // Navigate back if successful
-        } else {
+        }
+        else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to add job: ${response.statusCode}')));
         }
       } catch (e) {
@@ -54,6 +57,8 @@ class AddJobState extends State<AddJob> {
       }
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {

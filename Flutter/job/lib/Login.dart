@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'Model/LoginRequest.dart';
 import 'Service/AuthService.dart';
 
-class LoginScreen extends StatefulWidget {
+class Login extends StatefulWidget {
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<Login> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final AuthService _authService = AuthService();

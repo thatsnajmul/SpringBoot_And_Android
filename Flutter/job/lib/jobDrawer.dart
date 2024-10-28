@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:job/AdminViewJob.dart';
+import 'package:job/RegisterScreen.dart';
 import 'package:job/addJob.dart';
 import 'ViewJob.dart';
 
@@ -41,6 +42,20 @@ class JobDrawerState extends State<JobDrawer> {
               onTap: () {
                 // Navigates to ViewJob page, if you want a separate page instance
                 Navigator.push(context, MaterialPageRoute(builder: (context) => AdminViewJob()));
+              },
+            ),
+            ListTile(
+              title: Text('View Job'),
+              onTap: () {
+                // Navigates to ViewJob page, if you want a separate page instance
+                Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen()));
+              },
+            ),
+            ListTile(
+              title: Text('View Job'),
+              onTap: () {
+                // Navigates to ViewJob page, if you want a separate page instance
+                Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
               },
             ),
           ],

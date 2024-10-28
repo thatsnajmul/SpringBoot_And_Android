@@ -3,9 +3,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class UpdateJob extends StatefulWidget {
-  final String jobId; // ID of the job to update
+  final String id; // Add the 'id' parameter
 
-  UpdateJob({required this.jobId});
+  UpdateJob({required this.id}); // Mark 'id' as required
 
   @override
   _UpdateJobState createState() => _UpdateJobState();
@@ -29,123 +29,136 @@ class _UpdateJobState extends State<UpdateJob> {
   @override
   void initState() {
     super.initState();
-    _fetchJobDetails();
+    _fetchJobDetails(); // Load job details when the screen initializes
   }
 
   Future<void> _fetchJobDetails() async {
-    // Fetch job details from API
-    final response = await http.get(Uri.parse('http://localhost:8080/jobs/${widget.jobId}')); // Replace with your API URL
-    if (response.statusCode == 200) {
-      final job = json.decode(response.body);
-      jobTitleController.text = job['job_title'];
-      descriptionController.text = job['description'];
-      requirementsController.text = job['requirements'];
-      locationController.text = job['location'];
-      salaryController.text = job['salary'].toString();
-      jobTypeController.text = job['job_type'];
-      positionController.text = job['position'];
-      skillsController.text = job['skills'];
-      companyNameController.text = job['company_name'];
+    setState(() => _isLoading = true);
+    try {
+      final response = await http.get(Uri.parse('http://localhost:8080/getjob/${widget.id}')); // Adjust URL
+      if (response.statusCode == 200) {
+        final job = json.decode(response.body);
+        setState(() {
+          jobTitleController.text = job['jobTitle'] ?? 'No title';
+          descriptionController.text = job['description'] ?? 'No description';
+          requirementsController.text = job['requirements'] ?? 'No requirements';
+          locationController.text = job['location'] ?? 'Location not specified';
+          salaryController.text = job['salary']?.toString() ?? '0.0';
+          jobTypeController.text = job['jobType'] ?? 'Not specified';
+          positionController.text = job['position'] ?? 'Not specified';
+          skillsController.text = job['skills'] ?? 'No specific skills';
+          companyNameController.text = job['companyName'] ?? 'Company name unavailable';
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to fetch job details')));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
   Future<void> _updateJob() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    final response = await http.put(
-      Uri.parse('http://localhost:8080/updatejob/${widget.jobId}'), // Replace with your API URL
-      headers: <String, String>{
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({
-        'job_title': jobTitleController.text,
-        'description': descriptionController.text,
-        'requirements': requirementsController.text,
-        'location': locationController.text,
-        'salary': double.parse(salaryController.text),
-        'job_type': jobTypeController.text,
-        'position': positionController.text,
-        'skills': skillsController.text,
-        'company_name': companyNameController.text,
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      // Handle success
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Job updated successfully!')));
-      Navigator.pop(context); // Go back to previous screen
-    } else {
-      // Handle error
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update job')));
+    if (_formKey.currentState!.validate()) {
+      setState(() => _isLoading = true);
+      try {
+        final response = await http.put(
+          Uri.parse('http://localhost:8080/updatejob/${widget.id}'), // Adjust the URL
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode({
+            'jobTitle': jobTitleController.text,
+            'description': descriptionController.text,
+            'requirements': requirementsController.text,
+            'location': locationController.text,
+            'salary': double.tryParse(salaryController.text) ?? 0.0,
+            'jobType': jobTypeController.text,
+            'position': positionController.text,
+            'skills': skillsController.text,
+            'companyName': companyNameController.text,
+          }),
+        );
+        if (response.statusCode == 200) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Job updated successfully!')));
+          Navigator.pop(context); // Go back after update
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update job')));
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      } finally {
+        setState(() => _isLoading = false);
+      }
     }
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Update Job"),
-      ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Form(
-        key: _formKey,
-        child: Padding(
-          padding: EdgeInsets.all(minimumPadding * 2),
+      appBar: AppBar(title: Text('Update Job')),
+      body: Padding(
+        padding: EdgeInsets.all(minimumPadding),
+        child: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : Form(
+          key: _formKey,
           child: ListView(
             children: <Widget>[
-              buildTextField(jobTitleController, 'Job Title', 'Enter your Job Title'),
-              buildTextField(descriptionController, 'Job Description', 'Enter job description'),
-              buildTextField(requirementsController, 'Requirements', 'Enter job requirements'),
-              buildTextField(locationController, 'Location', 'Enter job location'),
-              buildTextField(salaryController, 'Salary', 'Enter salary amount', keyboardType: TextInputType.number),
-              buildTextField(jobTypeController, 'Job Type', 'e.g., Full-time, Part-time'),
-              buildTextField(positionController, 'Position', 'e.g., Junior, Senior, Intern'),
-              buildTextField(skillsController, 'Skills', 'Comma-separated list of skills'),
-              buildTextField(companyNameController, 'Company Name', 'Enter company name'),
-              Padding(
-                padding: EdgeInsets.only(top: minimumPadding),
-                child: ElevatedButton(
-                  child: Text('Update'),
-                  onPressed: () {
-                    if (_formKey.currentState?.validate() == true) {
-                      _updateJob();
-                    }
-                  },
-                ),
+              TextFormField(
+                controller: jobTitleController,
+                decoration: InputDecoration(labelText: 'Job Title'),
+                validator: (value) => value!.isEmpty ? 'Please enter job title' : null,
+              ),
+              TextFormField(
+                controller: descriptionController,
+                decoration: InputDecoration(labelText: 'Description'),
+                validator: (value) => value!.isEmpty ? 'Please enter description' : null,
+              ),
+              TextFormField(
+                controller: requirementsController,
+                decoration: InputDecoration(labelText: 'Requirements'),
+                validator: (value) => value!.isEmpty ? 'Please enter requirements' : null,
+              ),
+              TextFormField(
+                controller: locationController,
+                decoration: InputDecoration(labelText: 'Location'),
+                validator: (value) => value!.isEmpty ? 'Please enter location' : null,
+              ),
+              TextFormField(
+                controller: salaryController,
+                decoration: InputDecoration(labelText: 'Salary'),
+                validator: (value) => value!.isEmpty ? 'Please enter salary' : null,
+              ),
+              TextFormField(
+                controller: jobTypeController,
+                decoration: InputDecoration(labelText: 'Job Type'),
+                validator: (value) => value!.isEmpty ? 'Please enter job type' : null,
+              ),
+              TextFormField(
+                controller: positionController,
+                decoration: InputDecoration(labelText: 'Position'),
+                validator: (value) => value!.isEmpty ? 'Please enter position' : null,
+              ),
+              TextFormField(
+                controller: skillsController,
+                decoration: InputDecoration(labelText: 'Skills'),
+                validator: (value) => value!.isEmpty ? 'Please enter skills' : null,
+              ),
+              TextFormField(
+                controller: companyNameController,
+                decoration: InputDecoration(labelText: 'Company Name'),
+                validator: (value) => value!.isEmpty ? 'Please enter company name' : null,
+              ),
+              SizedBox(height: minimumPadding * 2),
+              ElevatedButton(
+                onPressed: _updateJob,
+                child: Text('Update Job'),
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget buildTextField(TextEditingController controller, String label, String hint, {TextInputType keyboardType = TextInputType.text}) {
-    return Padding(
-      padding: EdgeInsets.only(top: minimumPadding, bottom: minimumPadding),
-      child: TextFormField(
-        controller: controller,
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Please enter $label';
-          }
-          return null;
-        },
-        decoration: InputDecoration(
-          labelText: label,
-          hintText: hint,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(5.0),
-          ),
-        ),
-        keyboardType: keyboardType,
       ),
     );
   }

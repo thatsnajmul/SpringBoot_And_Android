@@ -9,7 +9,7 @@ public class JobEntity {
 
     @Id
     @GeneratedValue
-    private long id;
+    private Long id;
 
     //private companyemail;
     //private companyphone;
@@ -26,7 +26,7 @@ public class JobEntity {
     public JobEntity() {}
 
     // Getters and Setters
-    public long getId() {
+    public Long getId() {
         return id;
     }
 

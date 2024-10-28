@@ -28,6 +28,11 @@ public class JobService {
         return customJobs;
     }
 
+    public JobEntity getJobById(Long id) {
+        return jobRepository.findById(id).orElse(null); // Assuming you have a JobRepository
+    }
+
+
     // Job save/add method
     public String addJob(JobEntity job) {
         if (!jobRepository.existsByJobTitleAndDescriptionAndRequirementsAndLocationAndSalaryAndJobTypeAndPositionAndSkillsAndCompanyName(
@@ -47,15 +52,29 @@ public class JobService {
         }
     }
 
-    // Job delete method
-    public String removeJob(JobEntity job) {
-        if (jobRepository.existsById(job.getId())) {
-            jobRepository.delete(job);
+
+    // Job delete method in JobService
+    public String removeJob(Long id) { // Accept id instead of JobEntity
+        if (jobRepository.existsById(id)) {
+            jobRepository.deleteById(id); // Use deleteById for better clarity
             return "Job deleted successfully";
         } else {
             return "Job doesn't exist";
         }
     }
+
+
+
+
+//    // Job delete method
+//    public String removeJob(Long job) {
+//        if (jobRepository.existsById(job.getId())) {
+//            jobRepository.delete(job);
+//            return "Job deleted successfully";
+//        } else {
+//            return "Job doesn't exist";
+//        }
+//    }
 
     // Job update method
     public String updateJob(JobEntity job) {
@@ -66,6 +85,8 @@ public class JobService {
             return "Job doesn't exist";
         }
     }
+
+
 }
 
 

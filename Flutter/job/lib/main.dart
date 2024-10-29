@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'jobDrawer.dart'; // Import your JobDrawer widget
+import 'jobDrawer.dart'; // Import the JobDrawer widget
 import 'RegisterScreen.dart'; // Import the RegisterScreen widget
 import 'Login.dart'; // Import the LoginScreen widget
-import 'ViewJob.dart'; // Import your ViewJob widget
-import 'AddJob.dart'; // Import your AddJob widget
+import 'ViewJob.dart'; // Import the ViewJob widget
+import 'AddJob.dart'; // Import the AddJob widget
 
 void main() {
   runApp(MyApp());
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomeScreen(), // Change the home to HomeScreen
+      home: HomeScreen(), // Set HomeScreen as the home widget
     );
   }
 }
@@ -53,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => LoginScreen()),
+                MaterialPageRoute(builder: (context) => Login()),
               );
             },
           ),
@@ -84,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
         selectedItemColor: Colors.blue,
         onTap: _onItemTapped,
       ),
-      drawer: JobDrawer(), // Add the drawer here
+      drawer: JobDrawer(), // Ensure JobDrawer is implemented correctly
     );
   }
 }

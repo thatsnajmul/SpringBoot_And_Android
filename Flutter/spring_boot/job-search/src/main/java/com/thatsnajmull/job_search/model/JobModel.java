@@ -1,6 +1,6 @@
 package com.thatsnajmull.job_search.model;
 
-public class Job {
+public class JobModel {
 
     private long id;
 
@@ -16,7 +16,7 @@ public class Job {
     private String skills; // Comma-separated list of required skills
     private String companyName;
 
-    public Job() {}
+    public JobModel() {}
 
     // Getters and Setters
     public long getId() {

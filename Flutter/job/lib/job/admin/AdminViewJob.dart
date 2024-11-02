@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class ViewJob extends StatefulWidget {
+import 'package:job/job/admin/UpdateJob.dart';
+
+
+class AdminViewJob extends StatefulWidget {
   @override
   _ViewJobState createState() => _ViewJobState();
 }
 
-class _ViewJobState extends State<ViewJob> {
+class _ViewJobState extends State<AdminViewJob> {
   List<Job> _jobs = [];
-  List<Job> _filteredJobs = []; // For search filtering
+  List<Job> _filteredJobs = [];
   bool _isLoading = true;
   String _error = '';
   TextEditingController _searchController = TextEditingController();
@@ -29,12 +32,12 @@ class _ViewJobState extends State<ViewJob> {
 
   Future<void> _fetchJobs() async {
     try {
-      final response = await http.get(Uri.parse('http://localhost:8080/getalljobs'));
+      final response = await http.get(Uri.parse('http://192.168.88.243:8080/getalljobs'));
       if (response.statusCode == 200) {
         List jsonResponse = json.decode(response.body);
         setState(() {
           _jobs = jsonResponse.map((job) => Job.fromJson(job)).toList();
-          _filteredJobs = _jobs; // Initialize filtered list
+          _filteredJobs = _jobs;
           _isLoading = false;
         });
       } else {
@@ -54,10 +57,23 @@ class _ViewJobState extends State<ViewJob> {
   void _onSearchChanged() {
     setState(() {
       _filteredJobs = _jobs
-          .where((job) =>
-          job.jobTitle!.toLowerCase().contains(_searchController.text.toLowerCase()))
+          .where((job) => job.jobTitle!.toLowerCase().contains(_searchController.text.toLowerCase()))
           .toList();
     });
+  }
+
+  Future<void> _deleteJob(String id) async {
+    try {
+      final response = await http.delete(Uri.parse('http://192.168.88.243:8080/deletejob/$id'));
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Job deleted successfully!')));
+        _fetchJobs(); // Refresh the job list
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to delete job')));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+    }
   }
 
   void _sortJobs(String criteria) {
@@ -76,7 +92,6 @@ class _ViewJobState extends State<ViewJob> {
       appBar: AppBar(
         title: Text('Job Listings'),
         actions: [
-          // Dropdown for Sorting
           PopupMenuButton<String>(
             onSelected: _sortJobs,
             itemBuilder: (BuildContext context) {
@@ -92,7 +107,6 @@ class _ViewJobState extends State<ViewJob> {
       ),
       body: Column(
         children: [
-          // Search Bar with Autocomplete
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
@@ -106,7 +120,6 @@ class _ViewJobState extends State<ViewJob> {
               ),
             ),
           ),
-          // Display the list of jobs
           Expanded(
             child: _isLoading
                 ? Center(child: CircularProgressIndicator())
@@ -126,46 +139,37 @@ class _ViewJobState extends State<ViewJob> {
                       children: [
                         Text(
                           'Job Title: ${job.jobTitle}',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 8),
-                        Text(
-                          'Company: ${job.companyName}',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        Text('Location: ${job.location}',
-                            style: TextStyle(fontSize: 16)),
-                        Text(
-                            'Salary: \$${job.salary?.toStringAsFixed(2)}',
-                            style: TextStyle(fontSize: 16)),
-                        Text('Job Type: ${job.jobType}',
-                            style: TextStyle(fontSize: 16)),
-                        Text('Position: ${job.position}',
-                            style: TextStyle(fontSize: 16)),
+                        Text('Company: ${job.companyName}', style: TextStyle(fontSize: 16)),
+                        Text('Location: ${job.location}', style: TextStyle(fontSize: 16)),
+                        Text('Salary: \$${job.salary?.toStringAsFixed(2)}', style: TextStyle(fontSize: 16)),
+                        Text('Job Type: ${job.jobType}', style: TextStyle(fontSize: 16)),
+                        Text('Position: ${job.position}', style: TextStyle(fontSize: 16)),
                         SizedBox(height: 10),
-                        Text('Description:',
-                            style:
-                            TextStyle(fontWeight: FontWeight.bold)),
-                        Text(job.description ?? 'No description available'),
-                        SizedBox(height: 10),
-                        Text('Requirements:',
-                            style:
-                            TextStyle(fontWeight: FontWeight.bold)),
-                        Text(job.requirements ?? 'No requirements specified'),
-                        SizedBox(height: 10),
-                        Text('Skills Required:',
-                            style:
-                            TextStyle(fontWeight: FontWeight.bold)),
-                        Text(job.skills ?? 'No specific skills required'),
-                        SizedBox(height: 10),
-                        TextButton(
-                          onPressed: () {
-                            _showJobDetails(context, job);
-                          },
-                          child: Text('View Details',
-                              style: TextStyle(color: Colors.blue)),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => UpdateJob(id: job.id),
+                                  ),
+                                ).then((_) => _fetchJobs()); // Refresh jobs on return
+                              },
+                              child: Text('Edit'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () => _deleteJob(job.id), // Call the delete function
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                              ),
+                              child: Text('Delete'),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -178,44 +182,10 @@ class _ViewJobState extends State<ViewJob> {
       ),
     );
   }
-
-  void _showJobDetails(BuildContext context, Job job) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Job Title: ${job.jobTitle}',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              SizedBox(height: 8),
-              Text('Company: ${job.companyName}', style: TextStyle(fontSize: 16)),
-              Text('Location: ${job.location}', style: TextStyle(fontSize: 16)),
-              Text('Salary: \$${job.salary?.toStringAsFixed(2)}',
-                  style: TextStyle(fontSize: 16)),
-              Text('Job Type: ${job.jobType}', style: TextStyle(fontSize: 16)),
-              Text('Position: ${job.position}', style: TextStyle(fontSize: 16)),
-              SizedBox(height: 10),
-              Text('Description:', style: TextStyle(fontWeight: FontWeight.bold)),
-              Text(job.description ?? 'No description available'),
-              SizedBox(height: 10),
-              Text('Requirements:', style: TextStyle(fontWeight: FontWeight.bold)),
-              Text(job.requirements ?? 'No requirements specified'),
-              SizedBox(height: 10),
-              Text('Skills Required:', style: TextStyle(fontWeight: FontWeight.bold)),
-              Text(job.skills ?? 'No specific skills required'),
-            ],
-          ),
-        );
-      },
-    );
-  }
 }
 
 class Job {
+  final String id; // Ensure this matches the job ID field from your API
   final String? jobTitle;
   final String? description;
   final String? requirements;
@@ -227,6 +197,7 @@ class Job {
   final String? companyName;
 
   Job({
+    required this.id,
     this.jobTitle,
     this.description,
     this.requirements,
@@ -240,6 +211,7 @@ class Job {
 
   factory Job.fromJson(Map<String, dynamic> json) {
     return Job(
+      id: json['id']?.toString() ?? '', // Convert id to String if it's not already
       jobTitle: json['jobTitle'] ?? 'N/A',
       description: json['description'] ?? 'No description available',
       requirements: json['requirements'] ?? 'No requirements specified',

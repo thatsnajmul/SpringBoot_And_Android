@@ -1,7 +1,7 @@
 package com.thatsnajmull.job_search.controller;
 
 import com.thatsnajmull.job_search.entity.JobEntity;
-import com.thatsnajmull.job_search.model.Job;
+import com.thatsnajmull.job_search.model.JobModel;
 import com.thatsnajmull.job_search.service.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ public class JobController {
 
     // Get API Response
     @GetMapping("getalljobs")
-    public List<Job> getAllJobs() {
+    public List<JobModel> getAllJobs() {
         return jobService.getAllJob();
     }
 

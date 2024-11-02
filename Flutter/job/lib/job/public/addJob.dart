@@ -42,7 +42,7 @@ class AddJobState extends State<AddJob> {
 
       try {
         final response = await http.post(
-          Uri.parse('http://localhost:8080/addjob'), // Update with your API URL
+          Uri.parse('http://192.168.88.243:8080/addjob'), // Update with your API URL
           headers: {'Content-Type': 'application/json'},
           body: json.encode(jobData),
         );

@@ -1,7 +1,7 @@
 package com.thatsnajmull.job_search.service;
 
 import com.thatsnajmull.job_search.entity.JobEntity;
-import com.thatsnajmull.job_search.model.Job;
+import com.thatsnajmull.job_search.model.JobModel;
 import com.thatsnajmull.job_search.repository.JobRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +17,11 @@ public class JobService {
     private JobRepository jobRepository;
 
     // Job show method
-    public List<Job> getAllJob() {
+    public List<JobModel> getAllJob() {
         List<JobEntity> jobs = jobRepository.findAll();
-        List<Job> customJobs = new ArrayList<>();
+        List<JobModel> customJobs = new ArrayList<>();
         jobs.forEach(e -> {
-            Job job = new Job();
+            JobModel job = new JobModel();
             BeanUtils.copyProperties(e, job);
             customJobs.add(job);
         });

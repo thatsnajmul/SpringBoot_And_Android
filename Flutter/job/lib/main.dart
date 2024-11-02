@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'jobDrawer.dart'; // Import the JobDrawer widget
-import 'RegisterScreen.dart'; // Import the RegisterScreen widget
-import 'Login.dart'; // Import the LoginScreen widget
-import 'ViewJob.dart'; // Import the ViewJob widget
-import 'AddJob.dart'; // Import the AddJob widget
+import 'package:job/job/public/ViewJob.dart';
+import 'package:job/job/public/addJob.dart';
+import 'job/public/jobDrawer.dart'; // Import the JobDrawer widget
+import 'LoginReg/RegisterScreen.dart'; // Import the RegisterScreen widget
+import 'LoginReg/Login.dart'; // Import the LoginScreen widget
 
 void main() {
   runApp(MyApp());

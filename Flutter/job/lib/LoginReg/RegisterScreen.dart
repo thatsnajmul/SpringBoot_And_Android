@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'Model/LoginRequest.dart';
-import 'Model/User.dart';
-import 'Service/AuthService.dart';
+import '../Model/LoginRequest.dart';
+import '../Model/User.dart';
+import '../Service/AuthService.dart';
 
 class RegisterScreen extends StatelessWidget {
   final TextEditingController usernameController = TextEditingController();

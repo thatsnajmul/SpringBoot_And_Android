@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:job/AdminViewJob.dart';
-import 'package:job/RegisterScreen.dart';
-import 'package:job/addJob.dart';
-import 'ViewJob.dart';
+import 'package:job/job-application/admin/AdminViewJobApplication.dart';
+import 'package:job/job-application/public/ViewJobApplication.dart';
+import 'package:job/job/admin/AdminViewJob.dart';
+import 'package:job/LoginReg/RegisterScreen.dart';
+import 'package:job/job/public/addJob.dart';
+
 
 class JobDrawer extends StatelessWidget {
   final double minimumPadding = 5.0;
@@ -59,6 +61,27 @@ class JobDrawer extends StatelessWidget {
               );
             },
           ),
+          ListTile(
+            title: Text('View Job Application'),
+            onTap: () {
+              Navigator.pop(context); // Close the drawer
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ViewJobApplication(jobTitle: '',)),
+              );
+            },
+          ),
+          ListTile(
+            title: Text(' Admin View Job Application'),
+            onTap: () {
+              Navigator.pop(context); // Close the drawer
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AdminViewJobApplications(jobTitle: '')),
+              );
+            },
+          ),
+
         ],
       ),
     );

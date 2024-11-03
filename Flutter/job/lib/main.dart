@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:job/Profile.dart';
 import 'package:job/job/public/ViewJob.dart';
 import 'package:job/job/public/addJob.dart';
 import 'job/public/jobDrawer.dart'; // Import the JobDrawer widget
@@ -34,6 +35,10 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _widgetOptions = <Widget>[
     ViewJob(), // View Jobs
     AddJob(), // Add Job
+    ProfilePage(
+        name: 'name',
+        email: 'email',
+        profileImageUrl: 'https://nmhislam.wordpress.com/wp-content/uploads/2016/12/15129046_1776258662641056_826858525416318744_o.jpg')
   ];
 
   void _onItemTapped(int index) {
@@ -48,6 +53,15 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text('Job Search'),
         actions: [
+          IconButton(
+            icon: Icon(Icons.person),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => RegisterScreen()),
+              );
+            },
+          ),
           IconButton(
             icon: Icon(Icons.login),
             onPressed: () {
@@ -78,6 +92,10 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.add),
             label: 'Add Job',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
           ),
         ],
         currentIndex: _selectedIndex,

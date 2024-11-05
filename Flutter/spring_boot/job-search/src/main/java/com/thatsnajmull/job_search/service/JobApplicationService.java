@@ -31,14 +31,14 @@ public class JobApplicationService {
     }
 
     // Method to get a single job application by ID
-    public JobApplicationModel getJobApplicationById(Long id) {
-        Optional<JobApplicationEntity> jobApplicationEntity = jobApplicationRepository.findById(id);
+    public JobApplicationModel getJobApplicationById(Long applicationId) {
+        Optional<JobApplicationEntity> jobApplicationEntity = jobApplicationRepository.findById(applicationId);
         if (jobApplicationEntity.isPresent()) {
             JobApplicationModel model = new JobApplicationModel();
             BeanUtils.copyProperties(jobApplicationEntity.get(), model);
             return model;
         } else {
-            throw new RuntimeException("Job application not found for ID: " + id); // Consider creating a custom exception
+            throw new RuntimeException("Job application not found for ID: " + applicationId); // Consider creating a custom exception
         }
     }
 
@@ -69,9 +69,9 @@ public class JobApplicationService {
 
     // Method to delete a job application by ID
     @Transactional
-    public String removeJobApplication(Long id) {
-        if (jobApplicationRepository.existsByApplicationId(id)) {
-            jobApplicationRepository.deleteById(id);
+    public String removeJobApplication(Long applicationId) {
+        if (jobApplicationRepository.existsByApplicationId(applicationId)) {
+            jobApplicationRepository.deleteById(applicationId);
             return "Job application deleted successfully";
         } else {
             return "Job application doesn't exist";

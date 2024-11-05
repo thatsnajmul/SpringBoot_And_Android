@@ -2,11 +2,12 @@ package com.thatsnajmull.job_search.service;
 
 import com.thatsnajmull.job_search.entity.CompanyEntity;
 import com.thatsnajmull.job_search.repository.CompanyRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,10 +24,10 @@ public class CompanyService {
 
     // Retrieve company by ID
     public CompanyEntity getCompanyById(Long id) {
-        return companyRepository.findById(id).orElse(null);
+        return companyRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Company not found for ID: " + id));
     }
 
-    // Add new company
+    // Add a new company
     public String addCompany(CompanyEntity company) {
         if (!companyRepository.existsByCompanyName(company.getCompanyName())) {
             companyRepository.save(company);
@@ -36,7 +37,7 @@ public class CompanyService {
         }
     }
 
-    // Update existing company
+    // Update an existing company
     public String updateCompany(CompanyEntity company) {
         if (companyRepository.existsById(company.getId())) {
             companyRepository.save(company);
@@ -56,4 +57,3 @@ public class CompanyService {
         }
     }
 }
-

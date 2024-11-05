@@ -3,23 +3,22 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:job/job-application/admin/UpdateJobApplication.dart';
 
-// Model class for job applications
 class JobApplication {
-  final String id; // ID for the job application
+  final String applicationId;
   final String applicantName;
-  final String? applicantEmail; // Nullable
-  final String? applicantPhone; // Nullable
-  final String? resumeLink; // Nullable
+  final String? applicantEmail;
+  final String? applicantPhone;
+  final String? resumeLink;
   final String applicationDate;
-  final String? coverLetter; // Nullable
+  final String? coverLetter;
   final String jobTitleApplied;
-  final String skills; // String representation of skills
+  final String skills;
   final String jobTypeApplied;
-  final String? locationPreference; // Nullable
-  final String? positionLevel; // Nullable
+  final String? locationPreference;
+  final String? positionLevel;
 
   JobApplication({
-    required this.id,
+    required this.applicationId,
     required this.applicantName,
     this.applicantEmail,
     this.applicantPhone,
@@ -35,25 +34,27 @@ class JobApplication {
 
   factory JobApplication.fromJson(Map<String, dynamic> json) {
     return JobApplication(
-      id: json['id'] ?? '', // Provide default value if null
+      applicationId: json['applicationId'] is int
+          ? json['applicationId'].toString()  // If it's an int, convert it
+          : json['applicationId'] ?? '',      // Otherwise, use the value directly (if it's already a String)
       applicantName: json['applicantName'] ?? '',
-      applicantEmail: json['applicantEmail'], // Nullable, so no default needed
-      applicantPhone: json['applicantPhone'], // Nullable
-      resumeLink: json['resumeLink'], // Nullable
-      applicationDate: json['applicationDate'] ?? '', // Provide default value if null
-      coverLetter: json['coverLetter'], // Nullable
+      applicantEmail: json['applicantEmail'],
+      applicantPhone: json['applicantPhone'],
+      resumeLink: json['resumeLink'],
+      applicationDate: json['applicationDate'] ?? '',
+      coverLetter: json['coverLetter'],
       jobTitleApplied: json['jobTitleApplied'] ?? '',
-      skills: json['skills'] ?? '', // Provide default value if null
+      skills: json['skills'] ?? '',
       jobTypeApplied: json['jobTypeApplied'] ?? '',
-      locationPreference: json['locationPreference'], // Nullable
-      positionLevel: json['positionLevel'], // Nullable
+      locationPreference: json['locationPreference'],
+      positionLevel: json['positionLevel'],
     );
   }
+
 }
 
-// Stateful widget to view job applications
 class AdminViewJobApplications extends StatefulWidget {
-  final String jobTitle; // Job title received from the selected job
+  final String jobTitle;
   const AdminViewJobApplications({Key? key, required this.jobTitle}) : super(key: key);
 
   @override
@@ -63,11 +64,20 @@ class AdminViewJobApplications extends StatefulWidget {
 class _AdminViewJobApplicationsState extends State<AdminViewJobApplications> {
   String errorMessage = '';
   List<JobApplication> applications = [];
+  List<JobApplication> filteredApplications = [];
+  TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    fetchApplications(); // Fetch existing applications on initialization
+    fetchApplications();
+    searchController.addListener(onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   Future<void> fetchApplications() async {
@@ -77,23 +87,36 @@ class _AdminViewJobApplicationsState extends State<AdminViewJobApplications> {
         List jsonResponse = json.decode(response.body);
         setState(() {
           applications = jsonResponse.map((data) => JobApplication.fromJson(data)).toList();
+          filteredApplications = applications;
         });
       } else {
-        throw Exception('Failed to load applications');
+        setState(() {
+          errorMessage = 'Failed to load applications';
+        });
       }
     } catch (error) {
       setState(() {
-        errorMessage = error.toString();
+        errorMessage = 'Error: $error';
       });
     }
   }
 
-  Future<void> deleteApplication(String id) async {
+  void onSearchChanged() {
+    setState(() {
+      filteredApplications = applications
+          .where((application) =>
+      application.applicantName.toLowerCase().contains(searchController.text.toLowerCase()) ||
+          (application.applicantEmail?.toLowerCase().contains(searchController.text.toLowerCase()) ?? false))
+          .toList();
+    });
+  }
+
+  Future<void> deleteApplication(String applicationId) async {
     try {
-      final response = await http.delete(Uri.parse('http://192.168.88.243:8080/jobapplications/delete/$id'));
+      final response = await http.delete(Uri.parse('http://192.168.88.243:8080/jobapplications/delete/$applicationId'));
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Application deleted successfully!')));
-        fetchApplications(); // Refresh the list after deletion
+        fetchApplications();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to delete application')));
       }
@@ -110,32 +133,33 @@ class _AdminViewJobApplicationsState extends State<AdminViewJobApplications> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            if (errorMessage.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Text(errorMessage, style: TextStyle(color: Colors.red)),
+            TextField(
+              controller: searchController,
+              decoration: InputDecoration(
+                labelText: 'Search by applicant name',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
               ),
-            SizedBox(height: 20),
+            ),
+            SizedBox(height: 10),
+            if (errorMessage.isNotEmpty)
+              Text(errorMessage, style: TextStyle(color: Colors.red)),
             Expanded(
               child: ListView.separated(
-                itemCount: applications.length,
+                itemCount: filteredApplications.length,
                 itemBuilder: (context, index) {
-                  final application = applications[index];
+                  final application = filteredApplications[index];
                   return ListTile(
                     title: Text(application.applicantName),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Applicant Email: ${application.applicantEmail ?? 'N/A'}'), // Handle nullable
-                        Text('Phone: ${application.applicantPhone ?? 'N/A'}'), // Handle nullable
-                        Text('Resume Link: ${application.resumeLink ?? 'N/A'}'), // Handle nullable
-                        Text('Application Date: ${application.applicationDate}'),
-                        Text('Cover Letter: ${application.coverLetter ?? 'N/A'}'), // Handle nullable
-                        Text('Job Title Applied: ${application.jobTitleApplied}'),
-                        Text('Skills: ${application.skills}'),
-                        Text('Job Type: ${application.jobTypeApplied}'),
-                        Text('Location Preference: ${application.locationPreference ?? 'N/A'}'), // Handle nullable
-                        Text('Position Level: ${application.positionLevel ?? 'N/A'}'), // Handle nullable
+                        Text('Email: ${application.applicantEmail ?? 'N/A'}'),
+                        Text('Phone: ${application.applicantPhone ?? 'N/A'}'),
+                        Text('Resume: ${application.resumeLink ?? 'N/A'}'),
+                        Text('Date: ${application.applicationDate}'),
                       ],
                     ),
                     trailing: Row(
@@ -147,21 +171,21 @@ class _AdminViewJobApplicationsState extends State<AdminViewJobApplications> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => UpdateJobApplication(id: application.id), // Ensure UpdateJobApplication exists
+                                builder: (context) => UpdateJobApplication(applicationId: application.applicationId),
                               ),
-                            ).then((_) => fetchApplications()); // Refresh applications on return
+                            ).then((_) => fetchApplications());
                           },
                         ),
                         IconButton(
                           icon: Icon(Icons.delete),
                           color: Colors.red,
-                          onPressed: () => deleteApplication(application.id), // Call the delete function
+                          onPressed: () => deleteApplication(application.applicationId),
                         ),
                       ],
                     ),
                   );
                 },
-                separatorBuilder: (context, index) => Divider(), // Add separation between items
+                separatorBuilder: (context, index) => Divider(),
               ),
             ),
           ],

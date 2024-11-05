@@ -3,9 +3,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class UpdateJobApplication extends StatefulWidget {
-  final String id; // Add the 'id' parameter
+  final String applicationId; // Add the 'id' parameter
 
-  UpdateJobApplication({required this.id}); // Mark 'id' as required
+  UpdateJobApplication({required this.applicationId}); // Mark 'id' as required
 
   @override
   _UpdateJobApplicationState createState() => _UpdateJobApplicationState();
@@ -39,7 +39,7 @@ class _UpdateJobApplicationState extends State<UpdateJobApplication> {
     setState(() => _isLoading = true);
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.88.243:8080/jobapplications/get/${widget.id}'), // Adjust URL as needed
+        Uri.parse('http://192.168.88.243:8080/jobapplications/get/${widget.applicationId}'), // Adjust URL as needed
       );
       if (response.statusCode == 200) {
         final application = json.decode(response.body);
@@ -72,7 +72,7 @@ class _UpdateJobApplicationState extends State<UpdateJobApplication> {
       setState(() => _isLoading = true);
       try {
         final response = await http.put(
-          Uri.parse('http://192.168.88.243:8080/jobapplications/update/${widget.id}'), // Adjust the URL
+          Uri.parse('http://192.168.88.243:8080/jobapplications/update/${widget.applicationId}'), // Adjust the URL
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
           },

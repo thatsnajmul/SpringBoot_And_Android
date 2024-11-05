@@ -25,9 +25,9 @@ public class JobApplicationController {
     }
 
     // Get job application by ID
-    @GetMapping("/get/{id}") // URL: /jobapplications/get/{id}
-    public ResponseEntity<JobApplicationModel> getJobApplicationById(@PathVariable Long id) {
-        JobApplicationModel jobApplication = jobApplicationService.getJobApplicationById(id);
+    @GetMapping("/get/{applicationId}") // URL: /jobapplications/get/{id}
+    public ResponseEntity<JobApplicationModel> getJobApplicationById(@PathVariable Long applicationId) {
+        JobApplicationModel jobApplication = jobApplicationService.getJobApplicationById(applicationId);
         return ResponseEntity.ok(jobApplication); // Return application if found
     }
 
@@ -41,17 +41,17 @@ public class JobApplicationController {
     }
 
     // Update job application
-    @PutMapping("/update/{id}") // URL: /jobapplications/update/{id}
-    public ResponseEntity<String> updateJobApplication(@PathVariable Long id, @RequestBody JobApplicationModel jobApplication) {
-        jobApplication.setApplicationId(id); // Set the ID from the path variable
+    @PutMapping("/update/{applicationId}") // URL: /jobapplications/update/{id}
+    public ResponseEntity<String> updateJobApplication(@PathVariable Long applicationId, @RequestBody JobApplicationModel jobApplication) {
+        jobApplication.setApplicationId(applicationId); // Set the ID from the path variable
         String responseMessage = jobApplicationService.updateJobApplication(jobApplication);
         return ResponseEntity.ok(responseMessage); // Return update response
     }
 
     // Remove job application by ID
-    @DeleteMapping("/delete/{id}") // URL: /jobapplications/delete/{id}
-    public ResponseEntity<String> removeJobApplication(@PathVariable Long id) {
-        String responseMessage = jobApplicationService.removeJobApplication(id);
+    @DeleteMapping("delete/{applicationId}") // URL: /jobapplications/delete/{id}
+    public ResponseEntity<String> removeJobApplication(@PathVariable Long applicationId) {
+        String responseMessage = jobApplicationService.removeJobApplication(applicationId);
         return ResponseEntity.ok(responseMessage); // Return deletion response
     }
 }

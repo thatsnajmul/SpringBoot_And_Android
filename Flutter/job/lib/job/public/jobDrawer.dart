@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:job/company/admin/AdminViewCompany.dart';
+import 'package:job/company/public/AddCompany.dart';
+import 'package:job/company/public/ViewCompany.dart';
 import 'package:job/job-application/admin/AdminViewJobApplication.dart';
 import 'package:job/job-application/public/ViewJobApplication.dart';
 import 'package:job/job/admin/AdminViewJob.dart';
@@ -72,12 +75,42 @@ class JobDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            title: Text(' Admin View Job Application'),
+            title: Text('Admin View Job Application'),
             onTap: () {
               Navigator.pop(context); // Close the drawer
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => AdminViewJobApplications(jobTitle: '')),
+              );
+            },
+          ),
+          ListTile(
+            title: Text('Add Company'),
+            onTap: () {
+              Navigator.pop(context); // Close the drawer
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddCompany()),
+              );
+            },
+          ),
+          ListTile(
+            title: Text('View Company'),
+            onTap: () {
+              Navigator.pop(context); // Close the drawer
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ViewCompany()),
+              );
+            },
+          ),
+          ListTile(
+            title: Text('Admin View Company'),
+            onTap: () {
+              Navigator.pop(context); // Close the drawer
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AdminViewCompany()),
               );
             },
           ),

@@ -47,9 +47,6 @@ class JobApplication {
 }
 
 class ViewJobApplication extends StatefulWidget {
-  final String jobTitle; // Job title received from the selected job
-  const ViewJobApplication({Key? key, required this.jobTitle}) : super(key: key);
-
   @override
   _ViewJobApplicationState createState() => _ViewJobApplicationState();
 }
@@ -85,7 +82,7 @@ class _ViewJobApplicationState extends State<ViewJobApplication> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Applications for ${widget.jobTitle}')),
+      appBar: AppBar(title: Text('Job Application Details')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

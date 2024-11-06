@@ -8,7 +8,7 @@ class ViewCompany extends StatefulWidget {
 }
 
 class ViewCompanyState extends State<ViewCompany> {
-  Map<String, dynamic> company = {};  // Initialize company as an empty map
+  List<dynamic> companies = [];  // Initialize companies as an empty list
   bool isLoading = true;  // State variable to track loading status
 
   // Fetch company details
@@ -19,7 +19,7 @@ class ViewCompanyState extends State<ViewCompany> {
 
     if (response.statusCode == 200) {
       setState(() {
-        company = json.decode(response.body);  // Update company data
+        companies = json.decode(response.body);  // Parse the response body as a list
         isLoading = false;  // Data has been loaded, stop the loading indicator
       });
     } else {
@@ -46,21 +46,35 @@ class ViewCompanyState extends State<ViewCompany> {
           ? Center(child: CircularProgressIndicator())  // Show loading indicator while fetching data
           : Padding(
         padding: EdgeInsets.all(16.0),
-        child: company.isEmpty
-            ? Center(child: Text('No data available'))  // Show if no data was fetched
-            : Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Company Name: ${company['companyName'] ?? 'N/A'}', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 8),
-            Text('Email: ${company['companyEmail'] ?? 'N/A'}', style: TextStyle(fontSize: 16)),
-            SizedBox(height: 8),
-            Text('Phone: ${company['companyPhone'] ?? 'N/A'}', style: TextStyle(fontSize: 16)),
-            SizedBox(height: 8),
-            Text('Address: ${company['companyAddress'] ?? 'N/A'}', style: TextStyle(fontSize: 16)),
-            SizedBox(height: 8),
-            Text('Employee Size: ${company['employeeSize'] ?? 'N/A'}', style: TextStyle(fontSize: 16)),
-          ],
+        child: companies.isEmpty
+            ? Center(child: Text('No companies available'))  // Show if no data was fetched
+            : ListView.builder(
+          itemCount: companies.length,
+          itemBuilder: (context, index) {
+            var company = companies[index];
+            return Card(
+              margin: EdgeInsets.symmetric(vertical: 8.0),
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Company Name: ${company['companyName'] ?? 'N/A'}', style: TextStyle(fontSize: 18)),
+                    SizedBox(height: 8),
+                    Text('Email: ${company['companyEmail'] ?? 'N/A'}', style: TextStyle(fontSize: 16)),
+                    SizedBox(height: 8),
+                    Text('Phone: ${company['companyPhone'] ?? 'N/A'}', style: TextStyle(fontSize: 16)),
+                    SizedBox(height: 8),
+                    Text('Details: ${company['companyDetails'] ?? 'N/A'}', style: TextStyle(fontSize: 16)),
+                    SizedBox(height: 8),
+                    Text('Address: ${company['companyAddress'] ?? 'N/A'}', style: TextStyle(fontSize: 16)),
+                    SizedBox(height: 8),
+                    Text('Employee Size: ${company['employeeSize'] ?? 'N/A'}', style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

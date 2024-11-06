@@ -2,14 +2,15 @@ package com.thatsnajmull.job_search.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
 public class CompanyEntity {
 
     @Id
-    @GeneratedValue
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Use this for auto-incremented values
+    private Long companyId;
 
     private String companyName;
     private String companyImage; // URL or path to the company image
@@ -19,15 +20,16 @@ public class CompanyEntity {
     private String companyPhone;
     private int employeeSize; // Number of employees
 
+    // Default constructor
     public CompanyEntity() {}
 
     // Getters and Setters
-    public Long getId() {
-        return id;
+    public Long getCompanyId() {
+        return companyId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setCompanyId(Long companyId) {
+        this.companyId = companyId;
     }
 
     public String getCompanyName() {
@@ -86,4 +88,3 @@ public class CompanyEntity {
         this.employeeSize = employeeSize;
     }
 }
-

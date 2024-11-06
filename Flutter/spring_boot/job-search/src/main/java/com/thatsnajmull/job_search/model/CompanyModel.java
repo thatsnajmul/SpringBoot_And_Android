@@ -2,7 +2,7 @@ package com.thatsnajmull.job_search.model;
 
 public class CompanyModel {
 
-    private long id;
+    private long companyId;
     private String companyName;
     private String companyImage; // URL or path to the company image
     private String companyDetails;
@@ -11,15 +11,16 @@ public class CompanyModel {
     private String companyPhone;
     private int employeeSize; // Number of employees
 
+    // Default constructor
     public CompanyModel() {}
 
     // Getters and Setters
-    public long getId() {
-        return id;
+    public long getCompanyId() {
+        return companyId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setCompanyId(long companyId) {
+        this.companyId = companyId;
     }
 
     public String getCompanyName() {
@@ -78,4 +79,3 @@ public class CompanyModel {
         this.employeeSize = employeeSize;
     }
 }
-

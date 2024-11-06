@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class UpdateCompany extends StatefulWidget {
-  final int companyId;
+  final String companyId;
   UpdateCompany({required this.companyId});
 
   @override
@@ -20,27 +20,49 @@ class _UpdateCompanyState extends State<UpdateCompany> {
   final TextEditingController employeeSizeController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
 
+  // Fetch company details by ID
   Future<void> fetchCompanyDetails() async {
-    final response = await http.get(
-      Uri.parse('http://192.168.88.243:8080/api/companies/${widget.companyId}'),
-    );
+    setState(() {
+      _isLoading = true;  // Show loading indicator while fetching data
+    });
 
-    if (response.statusCode == 200) {
-      final company = json.decode(response.body);
-      companyNameController.text = company['companyName'];
-      companyDetailsController.text = company['companyDetails'];
-      companyEmailController.text = company['companyEmail'];
-      companyPhoneController.text = company['companyPhone'];
-      companyAddressController.text = company['companyAddress'];
-      employeeSizeController.text = company['employeeSize'].toString();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to load company details')));
+    try {
+      final response = await http.get(
+        Uri.parse('http://192.168.88.243:8080/api/companies/get-by-id/${widget.companyId}'),
+      );
+
+      if (response.statusCode == 200) {
+        final company = json.decode(response.body);
+
+        setState(() {
+          companyNameController.text = company['companyName'] ?? '';
+          companyDetailsController.text = company['companyDetails'] ?? '';
+          companyEmailController.text = company['companyEmail'] ?? '';
+          companyPhoneController.text = company['companyPhone'] ?? '';
+          companyAddressController.text = company['companyAddress'] ?? '';
+          employeeSizeController.text = company['employeeSize']?.toString() ?? '';
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to fetch company details')));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+    } finally {
+      setState(() {
+        _isLoading = false;  // Hide loading indicator after fetching
+      });
     }
   }
 
+  // Update company details
   Future<void> _updateCompany() async {
     if (_formKey.currentState?.validate() == true) {
+      setState(() {
+        _isLoading = true;  // Show loading indicator while updating data
+      });
+
       final updatedCompanyData = {
         'companyName': companyNameController.text,
         'companyDetails': companyDetailsController.text,
@@ -52,18 +74,23 @@ class _UpdateCompanyState extends State<UpdateCompany> {
 
       try {
         final response = await http.put(
-          Uri.parse('http://192.168.88.243:8080/api/companies/${widget.companyId}'),
+          Uri.parse('http://192.168.88.243:8080/api/companies/update/${widget.companyId}'),
           headers: {'Content-Type': 'application/json'},
           body: json.encode(updatedCompanyData),
         );
 
         if (response.statusCode == 200) {
-          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Company updated successfully!')));
+          Navigator.pop(context);  // Go back on successful update
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update company')));
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      } finally {
+        setState(() {
+          _isLoading = false;  // Hide loading indicator after update
+        });
       }
     }
   }
@@ -71,17 +98,19 @@ class _UpdateCompanyState extends State<UpdateCompany> {
   @override
   void initState() {
     super.initState();
-    fetchCompanyDetails();
+    fetchCompanyDetails();  // Fetch company details on initialization
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Update Company')),
-      body: Form(
-        key: _formKey,
-        child: Padding(
-          padding: EdgeInsets.all(minimumPadding * 2),
+      body: Padding(
+        padding: EdgeInsets.all(minimumPadding * 2),
+        child: _isLoading
+            ? Center(child: CircularProgressIndicator())  // Show loading spinner while fetching/updating
+            : Form(
+          key: _formKey,
           child: ListView(
             children: <Widget>[
               buildTextField(
@@ -115,12 +144,10 @@ class _UpdateCompanyState extends State<UpdateCompany> {
                 hint: 'Enter number of employees',
                 keyboardType: TextInputType.number,
               ),
-              Padding(
-                padding: EdgeInsets.only(top: minimumPadding),
-                child: ElevatedButton(
-                  child: Text('Update'),
-                  onPressed: _updateCompany,
-                ),
+              SizedBox(height: minimumPadding * 2),
+              ElevatedButton(
+                onPressed: _updateCompany,
+                child: Text('Update Company'),
               ),
             ],
           ),

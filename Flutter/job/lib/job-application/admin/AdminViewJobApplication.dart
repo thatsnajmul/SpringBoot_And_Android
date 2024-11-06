@@ -54,8 +54,6 @@ class JobApplication {
 }
 
 class AdminViewJobApplications extends StatefulWidget {
-  final String jobTitle;
-  const AdminViewJobApplications({Key? key, required this.jobTitle}) : super(key: key);
 
   @override
   _AdminViewJobApplicationsState createState() => _AdminViewJobApplicationsState();
@@ -128,7 +126,7 @@ class _AdminViewJobApplicationsState extends State<AdminViewJobApplications> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Applications for ${widget.jobTitle}')),
+      appBar: AppBar(title: Text('Job applications')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

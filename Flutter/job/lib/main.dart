@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:job/Profile.dart';
+import 'package:job/company/public/ViewCompany.dart';
 import 'package:job/job/public/ViewJob.dart';
 import 'package:job/job/public/addJob.dart';
 import 'job/public/jobDrawer.dart'; // Import the JobDrawer widget
@@ -34,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _widgetOptions = <Widget>[
     ViewJob(), // View Jobs
-    AddJob(), // Add Job
+    ViewCompany(), // Add Job
     ProfilePage(
         name: 'name',
         email: 'email',
@@ -91,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.add),
-            label: 'Add Job',
+            label: 'View Companies',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),

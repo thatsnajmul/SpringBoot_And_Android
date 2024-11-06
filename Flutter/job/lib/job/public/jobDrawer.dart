@@ -70,7 +70,7 @@ class JobDrawer extends StatelessWidget {
               Navigator.pop(context); // Close the drawer
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ViewJobApplication(jobTitle: '',)),
+                MaterialPageRoute(builder: (context) => ViewJobApplication()),
               );
             },
           ),
@@ -80,7 +80,7 @@ class JobDrawer extends StatelessWidget {
               Navigator.pop(context); // Close the drawer
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AdminViewJobApplications(jobTitle: '')),
+                MaterialPageRoute(builder: (context) => AdminViewJobApplications()),
               );
             },
           ),

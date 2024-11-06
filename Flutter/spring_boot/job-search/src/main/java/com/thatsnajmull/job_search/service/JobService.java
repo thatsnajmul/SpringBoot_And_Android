@@ -63,19 +63,6 @@ public class JobService {
         }
     }
 
-
-
-
-//    // Job delete method
-//    public String removeJob(Long job) {
-//        if (jobRepository.existsById(job.getId())) {
-//            jobRepository.delete(job);
-//            return "Job deleted successfully";
-//        } else {
-//            return "Job doesn't exist";
-//        }
-//    }
-
     // Job update method
     public String updateJob(JobEntity job) {
         if (jobRepository.existsById(job.getId())) {

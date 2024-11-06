@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:job/company/admin/AdminViewCompany.dart';
 import 'package:job/company/public/AddCompany.dart';
+import 'package:job/company/public/CarouselCompanyView.dart';
 import 'package:job/company/public/ViewCompany.dart';
 import 'package:job/job-application/admin/AdminViewJobApplication.dart';
 import 'package:job/job-application/public/ViewJobApplication.dart';
@@ -111,6 +112,16 @@ class JobDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => AdminViewCompany()),
+              );
+            },
+          ),
+          ListTile(
+            title: Text('Carosel Company View'),
+            onTap: () {
+              Navigator.pop(context); // Close the drawer
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CarouselCompanyView()),
               );
             },
           ),

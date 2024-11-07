@@ -17,6 +17,7 @@ class AddCompanyState extends State<AddCompany> {
   final TextEditingController companyPhoneController = TextEditingController();
   final TextEditingController companyAddressController = TextEditingController();
   final TextEditingController employeeSizeController = TextEditingController();
+  final TextEditingController companyImageController = TextEditingController(); // New controller for image URL
 
   final _formKey = GlobalKey<FormState>();
 
@@ -29,6 +30,7 @@ class AddCompanyState extends State<AddCompany> {
         'companyPhone': companyPhoneController.text,
         'companyAddress': companyAddressController.text,
         'employeeSize': int.tryParse(employeeSizeController.text) ?? 0,
+        'companyImage': companyImageController.text, // Adding the image URL to the request
       };
 
       try {
@@ -96,6 +98,12 @@ class AddCompanyState extends State<AddCompany> {
                 hint: 'Enter number of employees',
                 textStyle: textStyle,
                 keyboardType: TextInputType.number,
+              ),
+              buildTextField(
+                controller: companyImageController, // Add image URL field
+                label: 'Company Image URL',
+                hint: 'Enter company image URL',
+                textStyle: textStyle,
               ),
               Padding(
                 padding: EdgeInsets.only(top: minimumPadding),

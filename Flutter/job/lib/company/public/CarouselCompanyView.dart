@@ -1,35 +1,28 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:carousel_slider/carousel_slider.dart'; // Only import from carousel_slider
+import 'package:cached_network_image/cached_network_image.dart';  // Import CachedNetworkImage for caching images
 
 class CarouselCompanyView extends StatefulWidget {
   @override
-  CarouselCompanyViewState createState() => CarouselCompanyViewState();
+  _CarouselCompanyViewState createState() => _CarouselCompanyViewState();
 }
 
-class CarouselCompanyViewState extends State<CarouselCompanyView> {
-  List<dynamic> companies = [];  // Initialize companies as an empty list
-  bool isLoading = true;  // State variable to track loading status
+class _CarouselCompanyViewState extends State<CarouselCompanyView> {
+  List<dynamic> companies = [];
+  bool isLoading = true;
 
   // Fetch company details
   Future<void> fetchCompanyDetails() async {
-    final response = await http.get(
-      Uri.parse('http://192.168.88.243:8080/api/companies/get-all-companies'),  // Fixed URL
-    );
-
+    final response = await http.get(Uri.parse('http://192.168.88.243:8080/api/companies/get-all-companies'));
     if (response.statusCode == 200) {
       setState(() {
-        companies = json.decode(response.body);  // Parse the response body as a list
-        isLoading = false;  // Data has been loaded, stop the loading indicator
+        companies = json.decode(response.body);
+        isLoading = false;
       });
     } else {
-      setState(() {
-        isLoading = false;  // Stop the loading indicator
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: Failed to load company details')),
-      );
+      setState(() => isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: Failed to load company details')));
     }
   }
 
@@ -44,67 +37,67 @@ class CarouselCompanyViewState extends State<CarouselCompanyView> {
     return Scaffold(
       appBar: AppBar(title: Text('Company Details')),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())  // Show loading indicator while fetching data
-          : Padding(
-        padding: EdgeInsets.all(16.0),
-        child: companies.isEmpty
-            ? Center(child: Text('No companies available'))  // Show if no data was fetched
-            : ListView.builder(
-          itemCount: companies.length,
-          itemBuilder: (context, index) {
-            var company = companies[index];
-            return Card(
-              margin: EdgeInsets.symmetric(vertical: 8.0),
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Carousel slider for company images
-                    CarouselSlider(
-                      options: CarouselOptions(
-                        height: 200,  // Height of the carousel
-                        autoPlay: true,  // Enable auto play
-                        enlargeCenterPage: true,  // Center the current page
-                        aspectRatio: 16 / 9,  // Aspect ratio of carousel
-                        viewportFraction: 0.8,  // Adjust the item size
-                      ),
-                      items: company['companyImages']?.map<Widget>((imageUrl) {
-                        return Builder(
-                          builder: (BuildContext context) {
-                            return Container(
-                              width: MediaQuery.of(context).size.width,
-                              margin: EdgeInsets.symmetric(horizontal: 5.0),
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: NetworkImage(imageUrl),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      }).toList() ??
-                          [Center(child: Text('No images available'))],  // Placeholder if no images are found
+          ? Center(child: CircularProgressIndicator())
+          : companies.isEmpty
+          ? Center(child: Text('No companies available'))
+          : ListView.builder(
+        itemCount: companies.length,
+        itemBuilder: (context, index) {
+          var company = companies[index];
+
+          // Extract image URL
+          String? companyImage = company['companyImages']?.isNotEmpty == true
+              ? company['companyImages'][0] // Assuming this is a valid URL
+              : null;
+
+          // Debug: Print the image URL
+          print('Image URL: $companyImage');
+
+          // If image URL is not null and does not start with 'http', you may need to add a base URL
+          if (companyImage != null && !companyImage.startsWith('http')) {
+            companyImage = 'http://192.168.88.243:8080/images/companies/$companyImage'; // Adjust your base URL
+          }
+
+          return Card(
+            elevation: 4.0,
+            margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Display company image using CachedNetworkImage
+                  companyImage != null
+                      ? CachedNetworkImage(
+                    imageUrl: companyImage,
+                    height: 120,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) => Container(
+                      color: Colors.grey[200],
+                      height: 120,
+                      child: Center(child: Text('Failed to load image')),
                     ),
-                    SizedBox(height: 8),
-                    Text('Company Name: ${company['companyName'] ?? 'N/A'}', style: TextStyle(fontSize: 18)),
-                    SizedBox(height: 8),
-                    Text('Email: ${company['companyEmail'] ?? 'N/A'}', style: TextStyle(fontSize: 16)),
-                    SizedBox(height: 8),
-                    Text('Phone: ${company['companyPhone'] ?? 'N/A'}', style: TextStyle(fontSize: 16)),
-                    SizedBox(height: 8),
-                    Text('Details: ${company['companyDetails'] ?? 'N/A'}', style: TextStyle(fontSize: 16)),
-                    SizedBox(height: 8),
-                    Text('Address: ${company['companyAddress'] ?? 'N/A'}', style: TextStyle(fontSize: 16)),
-                    SizedBox(height: 8),
-                    Text('Employee Size: ${company['employeeSize'] ?? 'N/A'}', style: TextStyle(fontSize: 16)),
-                  ],
-                ),
+                  )
+                      : Container(
+                    height: 120,
+                    color: Colors.grey[200],
+                    child: Center(child: Text('No Image')),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Company: ${company['companyName'] ?? 'N/A'}',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text('Email: ${company['companyEmail'] ?? 'N/A'}', style: TextStyle(fontSize: 14)),
+                  Text('Phone: ${company['companyPhone'] ?? 'N/A'}', style: TextStyle(fontSize: 14)),
+                ],
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }

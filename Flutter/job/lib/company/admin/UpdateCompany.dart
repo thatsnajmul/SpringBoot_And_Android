@@ -30,7 +30,7 @@ class _UpdateCompanyState extends State<UpdateCompany> {
 
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.88.243:8080/api/companies/get-by-id/${widget.companyId}'),
+        Uri.parse('http://localhost:8080/api/companies/get-by-id/${widget.companyId}'),
       );
 
       if (response.statusCode == 200) {

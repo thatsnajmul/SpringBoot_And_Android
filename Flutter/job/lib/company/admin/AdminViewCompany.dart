@@ -22,7 +22,7 @@ class _AdminViewCompanyState extends State<AdminViewCompany> {
   // Fetch companies from the API
   Future<void> fetchCompanies() async {
     try {
-      final response = await http.get(Uri.parse('http://192.168.88.243:8080/api/companies/get-all-companies'));
+      final response = await http.get(Uri.parse('http://localhost:8080/api/companies/get-all-companies'));
 
       if (response.statusCode == 200) {
         setState(() {
@@ -47,7 +47,7 @@ class _AdminViewCompanyState extends State<AdminViewCompany> {
   // Delete company by ID
   Future<void> deleteCompany(String companyId) async {
     try {
-      final response = await http.delete(Uri.parse('http://192.168.88.243:8080/api/companies/delete/$companyId'));
+      final response = await http.delete(Uri.parse('http://localhost:8080/api/companies/delete/$companyId'));
 
       if (response.statusCode == 200 || response.statusCode == 204) {
         // If status code is 200 or 204, assume deletion is successful

@@ -32,7 +32,7 @@ class _ViewJobState extends State<AdminViewJob> {
 
   Future<void> _fetchJobs() async {
     try {
-      final response = await http.get(Uri.parse('http://192.168.88.243:8080/getalljobs'));
+      final response = await http.get(Uri.parse('http://localhost:8080/getalljobs'));
       if (response.statusCode == 200) {
         List jsonResponse = json.decode(response.body);
         setState(() {
@@ -64,7 +64,7 @@ class _ViewJobState extends State<AdminViewJob> {
 
   Future<void> _deleteJob(String id) async {
     try {
-      final response = await http.delete(Uri.parse('http://192.168.88.243:8080/deletejob/$id'));
+      final response = await http.delete(Uri.parse('http://localhost:8080/deletejob/$id'));
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Job deleted successfully!')));
         _fetchJobs(); // Refresh the job list

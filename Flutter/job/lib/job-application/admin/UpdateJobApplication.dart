@@ -39,7 +39,7 @@ class _UpdateJobApplicationState extends State<UpdateJobApplication> {
     setState(() => _isLoading = true);
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.88.243:8080/jobapplications/get/${widget.applicationId}'), // Adjust URL as needed
+        Uri.parse('http://localhost:8080/jobapplications/get/${widget.applicationId}'), // Adjust URL as needed
       );
       if (response.statusCode == 200) {
         final application = json.decode(response.body);
@@ -72,7 +72,7 @@ class _UpdateJobApplicationState extends State<UpdateJobApplication> {
       setState(() => _isLoading = true);
       try {
         final response = await http.put(
-          Uri.parse('http://192.168.88.243:8080/jobapplications/update/${widget.applicationId}'), // Adjust the URL
+          Uri.parse('http://localhost:8080/update/${widget.applicationId}'), // Adjust the URL
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
           },

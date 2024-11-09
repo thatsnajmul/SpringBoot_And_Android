@@ -50,7 +50,7 @@ class AddJobApplicationState extends State<AddJobApplication> {
 
       try {
         final response = await http.post(
-          Uri.parse('http://192.168.88.243:8080/jobapplications/add'),
+          Uri.parse('http://localhost:8080/jobapplications/add'),
           headers: {'Content-Type': 'application/json'},
           body: json.encode(applicationData),
         );

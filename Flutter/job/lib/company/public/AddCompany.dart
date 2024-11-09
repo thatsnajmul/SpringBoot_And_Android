@@ -35,7 +35,7 @@ class AddCompanyState extends State<AddCompany> {
 
       try {
         final response = await http.post(
-          Uri.parse('http://192.168.88.243:8080/api/companies/add-company'), // Update with your API URL
+          Uri.parse('http://localhost:8080/api/companies/add-company'), // Update with your API URL
           headers: {'Content-Type': 'application/json'},
           body: json.encode(companyData),
         );

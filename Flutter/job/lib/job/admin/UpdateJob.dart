@@ -35,7 +35,7 @@ class _UpdateJobState extends State<UpdateJob> {
   Future<void> _fetchJobDetails() async {
     setState(() => _isLoading = true);
     try {
-      final response = await http.get(Uri.parse('http://192.168.88.243:8080/getjob/${widget.id}')); // Adjust URL
+      final response = await http.get(Uri.parse('http://localhost:8080/getjob/${widget.id}')); // Adjust URL
       if (response.statusCode == 200) {
         final job = json.decode(response.body);
         setState(() {

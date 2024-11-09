@@ -80,7 +80,7 @@ class _AdminViewJobApplicationsState extends State<AdminViewJobApplications> {
 
   Future<void> fetchApplications() async {
     try {
-      final response = await http.get(Uri.parse('http://192.168.88.243:8080/jobapplications/getall'));
+      final response = await http.get(Uri.parse('http://localhost:8080/jobapplications/getall'));
       if (response.statusCode == 200) {
         List jsonResponse = json.decode(response.body);
         setState(() {
@@ -111,7 +111,7 @@ class _AdminViewJobApplicationsState extends State<AdminViewJobApplications> {
 
   Future<void> deleteApplication(String applicationId) async {
     try {
-      final response = await http.delete(Uri.parse('http://192.168.88.243:8080/jobapplications/delete/$applicationId'));
+      final response = await http.delete(Uri.parse('http://localhost:8080/jobapplications/delete/$applicationId'));
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Application deleted successfully!')));
         fetchApplications();

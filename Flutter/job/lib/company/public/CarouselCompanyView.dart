@@ -14,7 +14,7 @@ class _CarouselCompanyViewState extends State<CarouselCompanyView> {
 
   // Fetch company details
   Future<void> fetchCompanyDetails() async {
-    final response = await http.get(Uri.parse('http://192.168.88.243:8080/api/companies/get-all-companies'));
+    final response = await http.get(Uri.parse('http://localhost:8080/api/companies/get-all-companies'));
     if (response.statusCode == 200) {
       setState(() {
         companies = json.decode(response.body);
@@ -55,7 +55,7 @@ class _CarouselCompanyViewState extends State<CarouselCompanyView> {
 
           // If image URL is not null and does not start with 'http', you may need to add a base URL
           if (companyImage != null && !companyImage.startsWith('http')) {
-            companyImage = 'http://192.168.88.243:8080/images/companies/$companyImage'; // Adjust your base URL
+            companyImage = 'http://localhost:8080/images/companies/$companyImage'; // Adjust your base URL
           }
 
           return Card(

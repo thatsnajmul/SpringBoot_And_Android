@@ -31,7 +31,7 @@ class _ViewJobState extends State<ViewJob> {
 
   Future<void> _fetchJobs() async {
     try {
-      final response = await http.get(Uri.parse('http://192.168.88.243:8080/getalljobs'));
+      final response = await http.get(Uri.parse('http://localhost:8080/getalljobs'));
       if (response.statusCode == 200) {
         List jsonResponse = json.decode(response.body);
         setState(() {

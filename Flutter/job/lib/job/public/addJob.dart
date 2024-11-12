@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:io';  // For File
-import 'package:image_picker/image_picker.dart';  // For Image Picker
-import 'package:http_parser/http_parser.dart';  // For media type
+import 'dart:typed_data';  // For Uint8List
+import 'dart:html' as html;  // For HTML input
+import 'package:http_parser/http_parser.dart';
 
 class AddJob extends StatefulWidget {
   @override
@@ -25,18 +25,28 @@ class AddJobState extends State<AddJob> {
   final TextEditingController companyNameController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
-  File? _image;  // To hold the selected image file
+  Uint8List? _imageData;  // Image bytes
 
-  final picker = ImagePicker();
-
-  // Function to pick an image from the gallery
+  // Function to pick an image from file input
   Future<void> _pickImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
-    }
+    html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
+    uploadInput.accept = 'image/*';
+    uploadInput.click();
+
+    uploadInput.onChange.listen((event) {
+      final files = uploadInput.files;
+      if (files != null && files.isNotEmpty) {
+        final file = files[0];
+        final reader = html.FileReader();
+
+        reader.onLoadEnd.listen((event) {
+          setState(() {
+            _imageData = reader.result as Uint8List;
+          });
+        });
+        reader.readAsArrayBuffer(file);
+      }
+    });
   }
 
   // Function to submit the job along with the image
@@ -54,22 +64,22 @@ class AddJobState extends State<AddJob> {
         'companyName': companyNameController.text,
       };
 
-      // Prepare to send data with image
       var request = http.MultipartRequest(
-          'POST',
-          Uri.parse('http://localhost:8080/addjob')  // Update with your API URL
+        'POST',
+        Uri.parse('http://localhost:8080/addjob'), // Update with your API URL
       );
 
       // Add job data
       request.fields['jobDetails'] = json.encode(jobData);
 
-      if (_image != null) {
+      if (_imageData != null) {
         // Add the image to the request
         request.files.add(
-          await http.MultipartFile.fromPath(
-              'image',
-              _image!.path,
-              contentType: MediaType('image', 'jpeg')  // Change MIME type if needed
+          http.MultipartFile.fromBytes(
+            'image',
+            _imageData!,
+            filename: 'upload.jpg',
+            contentType: MediaType('image', 'jpeg'), // Adjust MIME type if needed
           ),
         );
       }
@@ -79,10 +89,14 @@ class AddJobState extends State<AddJob> {
         if (response.statusCode == 200 || response.statusCode == 201) {
           Navigator.pop(context); // Navigate back if successful
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to add job: ${response.statusCode}')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to add job: ${response.statusCode}')),
+          );
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
       }
     }
   }
@@ -160,13 +174,13 @@ class AddJobState extends State<AddJob> {
                 padding: EdgeInsets.only(top: minimumPadding),
                 child: ElevatedButton(
                   child: Text('Pick Image'),
-                  onPressed: _pickImage,  // Add the image picker functionality
+                  onPressed: _pickImage, // Add the image picker functionality
                 ),
               ),
-              if (_image != null)
+              if (_imageData != null)
                 Padding(
                   padding: EdgeInsets.only(top: minimumPadding),
-                  child: Image.file(_image!, height: 150, width: 150),  // Display selected image
+                  child: Image.memory(_imageData!, height: 150, width: 150), // Display selected image
                 ),
               Padding(
                 padding: EdgeInsets.only(top: minimumPadding),

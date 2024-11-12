@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:io';  // For File
+import 'package:image_picker/image_picker.dart';  // For Image Picker
+import 'package:http_parser/http_parser.dart';  // For media type
 
 class AddJob extends StatefulWidget {
   @override
@@ -22,7 +25,21 @@ class AddJobState extends State<AddJob> {
   final TextEditingController companyNameController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+  File? _image;  // To hold the selected image file
 
+  final picker = ImagePicker();
+
+  // Function to pick an image from the gallery
+  Future<void> _pickImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
+  }
+
+  // Function to submit the job along with the image
   Future<void> _submitJob() async {
     if (_formKey.currentState?.validate() == true) {
       final jobData = {
@@ -37,19 +54,31 @@ class AddJobState extends State<AddJob> {
         'companyName': companyNameController.text,
       };
 
-      // Debug print to verify jobData content
-      print("Job Data to be sent: $jobData");
+      // Prepare to send data with image
+      var request = http.MultipartRequest(
+          'POST',
+          Uri.parse('http://localhost:8080/addjob')  // Update with your API URL
+      );
+
+      // Add job data
+      request.fields['jobDetails'] = json.encode(jobData);
+
+      if (_image != null) {
+        // Add the image to the request
+        request.files.add(
+          await http.MultipartFile.fromPath(
+              'image',
+              _image!.path,
+              contentType: MediaType('image', 'jpeg')  // Change MIME type if needed
+          ),
+        );
+      }
 
       try {
-        final response = await http.post(
-          Uri.parse('http://localhost:8080/addjob'), // Update with your API URL
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode(jobData),
-        );
+        final response = await request.send();
         if (response.statusCode == 200 || response.statusCode == 201) {
           Navigator.pop(context); // Navigate back if successful
-        }
-        else {
+        } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to add job: ${response.statusCode}')));
         }
       } catch (e) {
@@ -57,8 +86,6 @@ class AddJobState extends State<AddJob> {
       }
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -129,6 +156,18 @@ class AddJobState extends State<AddJob> {
                 hint: 'Enter company name',
                 textStyle: textStyle,
               ),
+              Padding(
+                padding: EdgeInsets.only(top: minimumPadding),
+                child: ElevatedButton(
+                  child: Text('Pick Image'),
+                  onPressed: _pickImage,  // Add the image picker functionality
+                ),
+              ),
+              if (_image != null)
+                Padding(
+                  padding: EdgeInsets.only(top: minimumPadding),
+                  child: Image.file(_image!, height: 150, width: 150),  // Display selected image
+                ),
               Padding(
                 padding: EdgeInsets.only(top: minimumPadding),
                 child: ElevatedButton(

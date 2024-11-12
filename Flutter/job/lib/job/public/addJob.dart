@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:typed_data';  // For Uint8List
-import 'dart:html' as html;  // For HTML input
+import 'dart:typed_data';
+import 'dart:html' as html;
 import 'package:http_parser/http_parser.dart';
 
 class AddJob extends StatefulWidget {
@@ -25,7 +25,8 @@ class AddJobState extends State<AddJob> {
   final TextEditingController companyNameController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
-  Uint8List? _imageData;  // Image bytes
+  Uint8List? _imageData;
+  String? _imageName; // To store the selected image name
 
   // Function to pick an image from file input
   Future<void> _pickImage() async {
@@ -42,6 +43,7 @@ class AddJobState extends State<AddJob> {
         reader.onLoadEnd.listen((event) {
           setState(() {
             _imageData = reader.result as Uint8List;
+            _imageName = file.name;
           });
         });
         reader.readAsArrayBuffer(file);
@@ -69,7 +71,7 @@ class AddJobState extends State<AddJob> {
         Uri.parse('http://localhost:8080/addjob'), // Update with your API URL
       );
 
-      // Add job data
+      // Add job data as JSON
       request.fields['jobDetails'] = json.encode(jobData);
 
       if (_imageData != null) {
@@ -78,7 +80,7 @@ class AddJobState extends State<AddJob> {
           http.MultipartFile.fromBytes(
             'image',
             _imageData!,
-            filename: 'upload.jpg',
+            filename: _imageName ?? 'upload.jpg',
             contentType: MediaType('image', 'jpeg'), // Adjust MIME type if needed
           ),
         );

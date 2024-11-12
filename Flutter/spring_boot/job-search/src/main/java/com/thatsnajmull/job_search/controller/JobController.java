@@ -2,8 +2,9 @@ package com.thatsnajmull.job_search.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thatsnajmull.job_search.entity.JobEntity;
-import com.thatsnajmull.job_search.model.JobModel;
 import com.thatsnajmull.job_search.service.JobService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,8 @@ import java.util.List;
 @RestController
 @CrossOrigin(origins = "http://localhost:9097")
 public class JobController {
+
+    private final Logger logger = LoggerFactory.getLogger(JobController.class);
 
     @Autowired
     private JobService jobService;
@@ -52,9 +55,11 @@ public class JobController {
             return ResponseEntity.ok(result);
 
         } catch (IOException e) {
-            return ResponseEntity.status(500).body("Error processing image or job details: " + e.getMessage());
+            logger.error("Error saving image or parsing job details: " + e.getMessage(), e);
+            return ResponseEntity.status(500).body("Server error: Could not process image or job details.");
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(400).body("Invalid image file: " + e.getMessage());
+            logger.error("Invalid image file: " + e.getMessage(), e);
+            return ResponseEntity.status(400).body("Client error: Invalid image file.");
         }
     }
 
@@ -78,7 +83,8 @@ public class JobController {
             return ResponseEntity.ok(result);
 
         } catch (IOException e) {
-            return ResponseEntity.status(500).body("Error processing image or job details: " + e.getMessage());
+            logger.error("Error saving image or parsing job details: " + e.getMessage(), e);
+            return ResponseEntity.status(500).body("Server error: Could not process image or job details.");
         }
     }
 

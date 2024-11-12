@@ -2,6 +2,8 @@ package com.thatsnajmull.job_search.service;
 
 import com.thatsnajmull.job_search.entity.JobEntity;
 import com.thatsnajmull.job_search.repository.JobRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -21,7 +23,10 @@ public class JobService {
     private JobRepository jobRepository;
 
     // Directory to save uploaded images (adjust the path as needed)
-    private final String imageUploadDir = "/image/job"; // Can be configured in properties file
+    private final String imageUploadDir = "uploads"; // Can be configured in properties file
+
+    // Logger for error handling
+    private final Logger logger = LoggerFactory.getLogger(JobService.class);
 
     // Get all jobs
     public List<JobEntity> getAllJob() {
@@ -40,7 +45,6 @@ public class JobService {
             throw new IllegalArgumentException("Image file is empty or null");
         }
 
-        // Clean the filename and generate a unique one
         String originalFilename = StringUtils.cleanPath(image.getOriginalFilename());
         String newFilename = System.currentTimeMillis() + "_" + originalFilename;
 
@@ -50,10 +54,14 @@ public class JobService {
         // Ensure the directory exists
         Files.createDirectories(imagePath.getParent());
 
-        // Save the image to the directory
-        Files.copy(image.getInputStream(), imagePath);
+        try {
+            Files.copy(image.getInputStream(), imagePath);
+        } catch (IOException e) {
+            logger.error("Failed to save image: " + e.getMessage(), e);
+            throw new IOException("Could not save image file", e);
+        }
 
-        return newFilename; // Return the filename to store in the database
+        return newFilename;
     }
 
     // Add job with image filename

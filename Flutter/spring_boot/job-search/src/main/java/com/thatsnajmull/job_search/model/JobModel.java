@@ -4,8 +4,6 @@ public class JobModel {
 
     private long id;
 
-    //private companyemail;
-    //private companyphone;
     private String jobTitle;
     private String description;
     private String requirements;
@@ -15,6 +13,9 @@ public class JobModel {
     private String position; // e.g., Junior, Senior, Intern
     private String skills; // Comma-separated list of required skills
     private String companyName;
+
+    // Added image field to store image filename (or URL)
+    private String image;
 
     public JobModel() {}
 
@@ -97,5 +98,14 @@ public class JobModel {
 
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
+    }
+
+    // Getter and Setter for image field
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

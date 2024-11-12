@@ -2,17 +2,16 @@ package com.thatsnajmull.job_search.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
 public class JobEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //private companyemail;
-    //private companyphone;
     private String jobTitle;
     private String description;
     private String requirements;
@@ -23,6 +22,9 @@ public class JobEntity {
     private String skills; // Comma-separated list of required skills
     private String companyName;
 
+    // Added image field to store image file name
+    private String image;
+
     public JobEntity() {}
 
     // Getters and Setters
@@ -30,7 +32,7 @@ public class JobEntity {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -105,7 +107,13 @@ public class JobEntity {
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
     }
+
+    // Getter and Setter for image field
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
 }
-
-
-

@@ -1,14 +1,18 @@
 package com.thatsnajmull.job_search.service;
 
 import com.thatsnajmull.job_search.entity.JobEntity;
-import com.thatsnajmull.job_search.model.JobModel;
 import com.thatsnajmull.job_search.repository.JobRepository;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class JobService {
@@ -16,26 +20,46 @@ public class JobService {
     @Autowired
     private JobRepository jobRepository;
 
-    // Job show method
-    public List<JobModel> getAllJob() {
-        List<JobEntity> jobs = jobRepository.findAll();
-        List<JobModel> customJobs = new ArrayList<>();
-        jobs.forEach(e -> {
-            JobModel job = new JobModel();
-            BeanUtils.copyProperties(e, job);
-            customJobs.add(job);
-        });
-        return customJobs;
+    // Directory to save uploaded images (adjust the path as needed)
+    private final String imageUploadDir = "/image/job"; // Can be configured in properties file
+
+    // Get all jobs
+    public List<JobEntity> getAllJob() {
+        return jobRepository.findAll();
     }
 
+    // Get job by ID
     public JobEntity getJobById(Long id) {
-        return jobRepository.findById(id).orElse(null); // Assuming you have a JobRepository
+        Optional<JobEntity> job = jobRepository.findById(id);
+        return job.orElse(null); // Return null if not found
     }
 
+    // Save image to disk and return the image filename
+    public String saveImage(MultipartFile image) throws IOException {
+        if (image == null || image.isEmpty()) {
+            throw new IllegalArgumentException("Image file is empty or null");
+        }
 
-    // Job save/add method
+        // Clean the filename and generate a unique one
+        String originalFilename = StringUtils.cleanPath(image.getOriginalFilename());
+        String newFilename = System.currentTimeMillis() + "_" + originalFilename;
+
+        // Create the image file path
+        Path imagePath = Paths.get(imageUploadDir, newFilename);
+
+        // Ensure the directory exists
+        Files.createDirectories(imagePath.getParent());
+
+        // Save the image to the directory
+        Files.copy(image.getInputStream(), imagePath);
+
+        return newFilename; // Return the filename to store in the database
+    }
+
+    // Add job with image filename
     public String addJob(JobEntity job) {
-        if (!jobRepository.existsByJobTitleAndDescriptionAndRequirementsAndLocationAndSalaryAndJobTypeAndPositionAndSkillsAndCompanyName(
+        // Check if the job already exists
+        if (jobRepository.existsByJobTitleAndDescriptionAndRequirementsAndLocationAndSalaryAndJobTypeAndPositionAndSkillsAndCompanyName(
                 job.getJobTitle(),
                 job.getDescription(),
                 job.getRequirements(),
@@ -45,156 +69,50 @@ public class JobService {
                 job.getPosition(),
                 job.getSkills(),
                 job.getCompanyName())) {
-            jobRepository.save(job);
-            return "Job added successfully";
-        } else {
             return "This job already exists in the database";
         }
+
+        // Save the job entity
+        jobRepository.save(job);
+        return "Job added successfully";
     }
 
-
-    // Job delete method in JobService
-    public String removeJob(Long id) { // Accept id instead of JobEntity
-        if (jobRepository.existsById(id)) {
-            jobRepository.deleteById(id); // Use deleteById for better clarity
-            return "Job deleted successfully";
-        } else {
-            return "Job doesn't exist";
-        }
-    }
-
-    // Job update method
+    // Update job with image filename
     public String updateJob(JobEntity job) {
-        if (jobRepository.existsById(job.getId())) {
-            jobRepository.save(job);
-            return "Job updated successfully";
+        if (!jobRepository.existsById(job.getId())) {
+            return "Job not found";
+        }
+
+        // Update job entity in the repository
+        jobRepository.save(job);
+        return "Job updated successfully";
+    }
+
+    // Remove job
+    public String removeJob(Long id) {
+        if (jobRepository.existsById(id)) {
+            JobEntity job = jobRepository.findById(id).orElse(null);
+            if (job != null && job.getImage() != null) {
+                try {
+                    deleteImage(job.getImage());  // Delete the image if associated
+                } catch (IOException e) {
+                    return "Error deleting image: " + e.getMessage();
+                }
+            }
+            jobRepository.deleteById(id);
+            return "Job removed successfully";
         } else {
-            return "Job doesn't exist";
+            return "Job not found";
         }
     }
 
+    // Optionally, you can add logic to delete the image file from the disk when removing or updating jobs.
+    public void deleteImage(String imageFilename) throws IOException {
+        if (imageFilename != null && !imageFilename.isEmpty()) {
+            Path imagePath = Paths.get(imageUploadDir, imageFilename);
+            Files.deleteIfExists(imagePath);
+        }
+    }
 
+    // Other methods...
 }
-
-
-
-//package com.thatsnajmull.job_search.service;
-//
-//import com.thatsnajmull.job_search.entity.JobEntity;
-//import com.thatsnajmull.job_search.model.Job;
-//import com.thatsnajmull.job_search.repository.JobRepository;
-//import org.springframework.beans.BeanUtils;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Service;
-//
-//import java.util.ArrayList;
-//import java.util.List;
-//
-//@Service
-//public class JobService {
-//
-//    @Autowired
-//    JobRepository jobRepository;
-//
-//    //Job show method
-//    public List<Job> getAllJob(){
-//        try{
-//            List<JobEntity> jobs = jobRepository.findAll();
-//            List<Job> customJobs = new ArrayList<>();
-//            jobs.stream().forEach(e ->{
-//                Job job = new Job();
-//                BeanUtils.copyProperties(e, job);
-//                customJobs.add(job);
-//            });
-//            return customJobs;
-//        }
-//        catch (Exception e){
-//            throw e;
-//
-//        }
-//    }
-//
-//    //Job save/add method
-//    public String addJob(JobEntity job){
-//        try{
-//            if (!jobRepository.existsByAllJobProperties(
-//                    job.getJobTitle(),
-//                    job.getDescription(),
-//                    job.getRequirements(),
-//                    job.getLocation(),
-//                    job.getSalary(),
-//                    job.getJobType(),
-//                    job.getPosition(),
-//                    job.getSkills(),
-//                    job.getCompanyName())){
-//                        jobRepository.save(job);
-//                    return "Job added successfully";
-//            }
-//            else {
-//                return "This job already exists in the database";
-//            }
-//        }
-//        catch (Exception e){
-//            throw e;
-//        }
-//    }
-//
-//
-//    //Job delete method
-//    public String removeJob(JobEntity job){
-//        try{
-//            if (jobRepository.existsById(job.getId())){
-//                jobRepository.delete(job);
-//                return "Job deleted successfully";
-//            }
-//            else {
-//                return "Job doesn't exists";
-//            }
-//        }
-//        catch (Exception e){
-//            throw e;
-//        }
-//    }
-////    public String removeJob(JobEntity job){
-////        try{
-////            if (jobRepository.existsByAllJobProperties(
-////                    job.getJobTitle(),
-////                    job.getDescription(),
-////                    job.getRequirements(),
-////                    job.getLocation(),
-////                    job.getSalary(),
-////                    job.getJobType(),
-////                    job.getPosition(),
-////                    job.getSkills(),
-////                    job.getCompanyName())){
-////                jobRepository.delete(job);
-////                return "Job deleted successfully";
-////            }
-////            else {
-////                return "Job doesn't exists";
-////            }
-////        }
-////
-////        catch (Exception e){
-////            throw e;
-////        }
-////    }
-//
-//    //Job update method
-//
-//    public String updateJob(JobEntity job){
-//        try{
-//            if (jobRepository.existsById(job.getId())){
-//                jobRepository.save(job);
-//                return "Job updated successfully";
-//            }
-//            else {
-//                return "Job doesn't exists";
-//            }
-//        }
-//        catch (Exception e){
-//            throw e;
-//        }
-//    }
-//
-//}

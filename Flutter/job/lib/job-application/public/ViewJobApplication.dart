@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
 class JobApplication {
   final String applicantName;
@@ -10,7 +15,7 @@ class JobApplication {
   final String applicationDate;
   final String coverLetter;
   final String jobTitleApplied;
-  final String skills; // String representation of skills
+  final String skills;
   final String jobTypeApplied;
   final String locationPreference;
   final String positionLevel;
@@ -79,6 +84,71 @@ class _ViewJobApplicationState extends State<ViewJobApplication> {
     }
   }
 
+  // Method to generate the PDF document
+  Future<pw.Document> generatePDF() async {
+    final pdf = pw.Document();
+
+    // Add pages for each job application
+    for (var application in applications) {
+      pdf.addPage(
+        pw.Page(
+          build: (pw.Context context) {
+            return pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text('Applicant Name: ${application.applicantName}', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                pw.Text('Applicant Email: ${application.applicantEmail}'),
+                pw.Text('Phone: ${application.applicantPhone}'),
+                pw.Text('Resume Link: ${application.resumeLink}'),
+                pw.Text('Application Date: ${application.applicationDate}'),
+                pw.Text('Cover Letter: ${application.coverLetter}'),
+                pw.Text('Job Title Applied: ${application.jobTitleApplied}'),
+                pw.Text('Skills: ${application.skills}'),
+                pw.Text('Job Type Applied: ${application.jobTypeApplied}'),
+                pw.Text('Location Preference: ${application.locationPreference}'),
+                pw.Text('Position Level: ${application.positionLevel}'),
+                pw.SizedBox(height: 20),
+              ],
+            );
+          },
+        ),
+      );
+    }
+    return pdf;
+  }
+
+  // Method to download the PDF
+  Future<void> generateAndDownloadPDF() async {
+    try {
+      final pdf = await generatePDF();
+      final output = await getTemporaryDirectory();
+      final filePath = '${output.path}/job_applications.pdf';
+      final file = File(filePath);
+
+      // Save the PDF file to disk
+      await file.writeAsBytes(await pdf.save());
+
+      // Share the PDF
+      await Printing.sharePdf(bytes: await pdf.save(), filename: 'job_applications.pdf');
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Error saving or sharing PDF: $e';
+      });
+    }
+  }
+
+  // Method to print the PDF
+  Future<void> printPDF() async {
+    try {
+      final pdf = await generatePDF();
+      await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdf.save());
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Error printing PDF: $e';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,19 +176,30 @@ class _ViewJobApplicationState extends State<ViewJobApplication> {
                         Text('Applicant Name: ${application.applicantName}'),
                         Text('Applicant Email: ${application.applicantEmail}'),
                         Text('Phone: ${application.applicantPhone}'),
-                        Text('resumeLink: ${application.resumeLink}'),
-                        Text('applicationDate: ${application.applicationDate}'),
-                        Text('coverLetter: ${application.coverLetter}'),
-                        Text('jobTitleApplied: ${application.jobTitleApplied}'),
-                        Text('skills: ${application.skills}'),
-                        Text('jobTypeApplied: ${application.jobTypeApplied}'),
-                        Text('locationPreference: ${application.locationPreference}'),
-                        Text('positionLevel: ${application.positionLevel}'),
+                        Text('Resume Link: ${application.resumeLink}'),
+                        Text('Application Date: ${application.applicationDate}'),
+                        Text('Cover Letter: ${application.coverLetter}'),
+                        Text('Job Title Applied: ${application.jobTitleApplied}'),
+                        Text('Skills: ${application.skills}'),
+                        Text('Job Type Applied: ${application.jobTypeApplied}'),
+                        Text('Location Preference: ${application.locationPreference}'),
+                        Text('Position Level: ${application.positionLevel}'),
+
+                        // Button to download PDF
+                        ElevatedButton(
+                          onPressed: generateAndDownloadPDF,
+                          child: Text('Download as PDF'),
+                        ),
+                        // Button to print PDF
+                        ElevatedButton(
+                          onPressed: printPDF,
+                          child: Text('Print'),
+                        ),
                       ],
                     ),
                   );
                 },
-                separatorBuilder: (context, index) => Divider(), // Add separation between items
+                separatorBuilder: (context, index) => Divider(),
               ),
             ),
           ],

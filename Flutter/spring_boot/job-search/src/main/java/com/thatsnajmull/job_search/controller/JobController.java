@@ -1,12 +1,15 @@
 package com.thatsnajmull.job_search.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thatsnajmull.job_search.entity.JobEntity;
 import com.thatsnajmull.job_search.model.JobModel;
 import com.thatsnajmull.job_search.service.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -16,42 +19,73 @@ public class JobController {
     @Autowired
     private JobService jobService;
 
-    // Get API Response
+    // Get all jobs
     @GetMapping("getalljobs")
-    public List<JobModel> getAllJobs() {
+    public List<JobEntity> getAllJobs() {
         return jobService.getAllJob();
     }
 
-
-    // Get API Response - Get job by ID
+    // Get job by ID
     @GetMapping("getjob/{id}")
     public ResponseEntity<JobEntity> getJobById(@PathVariable Long id) {
-        JobEntity job = jobService.getJobById(id); // Call service to get job by ID
+        JobEntity job = jobService.getJobById(id);
         if (job != null) {
-            return ResponseEntity.ok(job); // Return job if found
+            return ResponseEntity.ok(job);
         } else {
-            return ResponseEntity.notFound().build(); // Return 404 if not found
+            return ResponseEntity.notFound().build();
         }
     }
 
-
-    // Post API Response
+    // Add job with image
     @PostMapping("addjob")
-    public String addJob(@RequestBody JobEntity job) {
-        return jobService.addJob(job);
+    public ResponseEntity<String> addJob(@RequestParam("jobDetails") String jobDetails,
+                                         @RequestParam("image") MultipartFile image) {
+        try {
+            JobEntity job = new ObjectMapper().readValue(jobDetails, JobEntity.class);
+
+            // Save the image and set the filename on the job entity
+            String imageFilename = jobService.saveImage(image);
+            job.setImage(imageFilename); // Set the image filename to the job entity
+
+            // Add the job to the database
+            String result = jobService.addJob(job);
+            return ResponseEntity.ok(result);
+
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("Error processing image or job details: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400).body("Invalid image file: " + e.getMessage());
+        }
     }
 
-    // Put API Response
+    // Update job with image
     @PutMapping("updatejob/{id}")
-    public String updateJob(@PathVariable Long id, @RequestBody JobEntity job) {
-        job.setId(id); // Set the ID from the path variable
-        return jobService.updateJob(job); // Pass the complete JobEntity for updating
+    public ResponseEntity<String> updateJob(@PathVariable Long id,
+                                            @RequestParam("jobDetails") String jobDetails,
+                                            @RequestParam(value = "image", required = false) MultipartFile image) {
+        try {
+            JobEntity job = new ObjectMapper().readValue(jobDetails, JobEntity.class);
+            job.setId(id);
+
+            if (image != null && !image.isEmpty()) {
+                // Save the image and update the filename
+                String imageFilename = jobService.saveImage(image);
+                job.setImage(imageFilename); // Update the image filename in the job entity
+            }
+
+            // Update the job in the database
+            String result = jobService.updateJob(job);
+            return ResponseEntity.ok(result);
+
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("Error processing image or job details: " + e.getMessage());
+        }
     }
 
-    // Delete API Response
+    // Delete job
     @DeleteMapping("deletejob/{id}")
-    public String removeJob(@PathVariable Long id) { // Change from JobEntity to Long
-        return jobService.removeJob(id); // Pass the ID directly to the service
+    public ResponseEntity<String> removeJob(@PathVariable Long id) {
+        String result = jobService.removeJob(id);
+        return ResponseEntity.ok(result);
     }
 }
-

@@ -50,9 +50,6 @@ class _CarouselCompanyViewState extends State<CarouselCompanyView> {
               ? company['companyImages'][0] // Assuming this is a valid URL
               : null;
 
-          // Debug: Print the image URL
-          print('Image URL: $companyImage');
-
           // If image URL is not null and does not start with 'http', you may need to add a base URL
           if (companyImage != null && !companyImage.startsWith('http')) {
             companyImage = 'http://localhost:8080/images/companies/$companyImage'; // Adjust your base URL
@@ -61,40 +58,35 @@ class _CarouselCompanyViewState extends State<CarouselCompanyView> {
           return Card(
             elevation: 4.0,
             margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            child: Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Column(
+            child: ListTile(
+              contentPadding: EdgeInsets.all(10.0),
+              leading: companyImage != null
+                  ? CachedNetworkImage(
+                imageUrl: companyImage,
+                width: 60,
+                height: 60,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => CircularProgressIndicator(),
+                errorWidget: (context, url, error) => Icon(Icons.error),
+              )
+                  : Icon(Icons.business, size: 60, color: Colors.grey),
+              title: Text(
+                company['companyName'] ?? 'N/A',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+              ),
+              subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Display company image using CachedNetworkImage
-                  companyImage != null
-                      ? CachedNetworkImage(
-                    imageUrl: companyImage,
-                    height: 120,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                    errorWidget: (context, url, error) => Container(
-                      color: Colors.grey[200],
-                      height: 120,
-                      child: Center(child: Text('Failed to load image')),
-                    ),
-                  )
-                      : Container(
-                    height: 120,
-                    color: Colors.grey[200],
-                    child: Center(child: Text('No Image')),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Company: ${company['companyName'] ?? 'N/A'}',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text('Email: ${company['companyEmail'] ?? 'N/A'}', style: TextStyle(fontSize: 14)),
-                  Text('Phone: ${company['companyPhone'] ?? 'N/A'}', style: TextStyle(fontSize: 14)),
+                  Text('Email: ${company['companyEmail'] ?? 'N/A'}'),
+                  Text('Phone: ${company['companyPhone'] ?? 'N/A'}'),
                 ],
               ),
+              trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey),
+              onTap: () {
+                // Handle onTap event (e.g., navigate to a detailed view)
+                // You can navigate to a detailed page with more info
+              },
             ),
           );
         },

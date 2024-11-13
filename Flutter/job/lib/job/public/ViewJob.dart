@@ -77,7 +77,6 @@ class _ViewJobState extends State<ViewJob> {
       appBar: AppBar(
         title: Text('Job Listings'),
         actions: [
-          // Dropdown for Sorting
           PopupMenuButton<String>(
             onSelected: _sortJobs,
             itemBuilder: (BuildContext context) {
@@ -93,7 +92,6 @@ class _ViewJobState extends State<ViewJob> {
       ),
       body: Column(
         children: [
-          // Search Bar with Autocomplete
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
@@ -107,7 +105,6 @@ class _ViewJobState extends State<ViewJob> {
               ),
             ),
           ),
-          // Display the list of jobs
           Expanded(
             child: _isLoading
                 ? Center(child: CircularProgressIndicator())
@@ -120,74 +117,41 @@ class _ViewJobState extends State<ViewJob> {
                 return Card(
                   margin: EdgeInsets.all(10),
                   elevation: 4,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ListTile(
+                    contentPadding: EdgeInsets.all(16),
+                    title: Text(
+                      job.jobTitle ?? 'Job Title Unavailable',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Job Title: ${job.jobTitle}',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(job.companyName ?? 'Company Name Unavailable', style: TextStyle(fontSize: 16)),
+                            Text('\$${job.salary?.toStringAsFixed(2)}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                          ],
                         ),
                         SizedBox(height: 8),
-                        Text(
-                          'Company: ${job.companyName}',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        Text('Location: ${job.location}',
-                            style: TextStyle(fontSize: 16)),
-                        Text(
-                            'Salary: \$${job.salary?.toStringAsFixed(2)}',
-                            style: TextStyle(fontSize: 16)),
-                        Text('Job Type: ${job.jobType}',
-                            style: TextStyle(fontSize: 16)),
-                        Text('Position: ${job.position}',
-                            style: TextStyle(fontSize: 16)),
+                        Text('Location: ${job.location ?? 'Not specified'}', style: TextStyle(fontSize: 14)),
+                        SizedBox(height: 8),
+                        Text('Job Type: ${job.jobType ?? 'Not specified'}', style: TextStyle(fontSize: 14)),
                         SizedBox(height: 10),
-                        Text('Description:',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text(job.description ?? 'No description available'),
-                        SizedBox(height: 10),
-                        Text('Requirements:',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text(job.requirements ?? 'No requirements specified'),
-                        SizedBox(height: 10),
-                        Text('Skills Required:',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text(job.skills ?? 'No specific skills required'),
-                        SizedBox(height: 10),
-                        // Show job logo/image if available
-                        job.image != null && job.image!.isNotEmpty
-                            ? Image.network("http://localhost:8080/uploads/jobs/" + job.image!)
-                            : Container(
-                          width: 100,
-                          height: 100,
-                          color: Colors.grey[200],
-                          child: Center(child: Text('No Image')),
-                        ),
-                        SizedBox(height: 10),
-                        ElevatedButton(
-                          onPressed: () {
-                            // Navigate to AddJob activity
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => AddJobApplication()),
-                            );
-                          },
-                          child: Text('Apply Now'),
-                        ),
-                        SizedBox(height: 10),
-                        TextButton(
-                          onPressed: () {
-                            _showJobDetails(context, job);
-                          },
-                          child: Text('View Details',
-                              style: TextStyle(color: Colors.blue)),
-                        ),
                       ],
                     ),
+                    trailing: job.image != null && job.image!.isNotEmpty
+                        ? Image.network("http://localhost:8080/uploads/jobs/" + job.image!, width: 50, height: 50, fit: BoxFit.cover)
+                        : Icon(Icons.business, size: 50),
+                    onTap: () {
+                      _showJobDetails(context, job);
+                    },
                   ),
                 );
               },
@@ -232,7 +196,6 @@ class _ViewJobState extends State<ViewJob> {
                 },
                 child: Text('Apply Now'),
               ),
-              SizedBox(height: 5),
             ],
           ),
         );

@@ -53,40 +53,60 @@ class ViewCompanyState extends State<ViewCompany> {
           itemBuilder: (context, index) {
             var company = companies[index];
             return Card(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12), // Rounded corners
+              ),
               margin: EdgeInsets.symmetric(vertical: 8.0),
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Column(
+              child: ListTile(
+                contentPadding: EdgeInsets.all(16),
+                leading: company['companyImage'] != null && company['companyImage'].isNotEmpty
+                    ? ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    "http://192.168.88.243:8080/uploads/companies/${company['companyImage']}",
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                  ),
+                )
+                    : Container(
+                  width: 80,
+                  height: 80,
+                  color: Colors.grey[200],
+                  child: Icon(Icons.business, color: Colors.grey),
+                ),
+                title: Text(
+                  company['companyName'] ?? 'N/A',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blueAccent,
+                  ),
+                ),
+                subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Company Name: ${company['companyName'] ?? 'N/A'}', style: TextStyle(fontSize: 18)),
                     SizedBox(height: 8),
-                    Text('Email: ${company['companyEmail'] ?? 'N/A'}', style: TextStyle(fontSize: 16)),
-                    SizedBox(height: 8),
-                    Text('Phone: ${company['companyPhone'] ?? 'N/A'}', style: TextStyle(fontSize: 16)),
-                    SizedBox(height: 8),
-                    Text('Details: ${company['companyDetails'] ?? 'N/A'}', style: TextStyle(fontSize: 16)),
-                    SizedBox(height: 8),
-                    Text('Address: ${company['companyAddress'] ?? 'N/A'}', style: TextStyle(fontSize: 16)),
-                    SizedBox(height: 8),
-                    Text('Employee Size: ${company['employeeSize'] ?? 'N/A'}', style: TextStyle(fontSize: 16)),
-
-                    // Show company image if available
-                    company['companyImage'] != null && company['companyImage'].isNotEmpty
-                        ? Image.network(
-                      "http://192.168.88.243:8080/uploads/companies/${company['companyImage']}",
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.cover,
-                    )
-                        : Container(
-                      width: 100,
-                      height: 100,
-                      color: Colors.grey[200],
-                      child: Center(child: Text('No Image')),
+                    Text(
+                      'Email: ${company['companyEmail'] ?? 'N/A'}',
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                    Text(
+                      'Phone: ${company['companyPhone'] ?? 'N/A'}',
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                    Text(
+                      'Employee Size: ${company['employeeSize'] ?? 'N/A'}',
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                   ],
                 ),
+                isThreeLine: true, // Allow for 3 lines in subtitle
+                trailing: Icon(Icons.arrow_forward_ios, size: 18, color: Colors.grey),
+                onTap: () {
+                  // Add your navigation or other onTap functionality here
+                },
               ),
             );
           },

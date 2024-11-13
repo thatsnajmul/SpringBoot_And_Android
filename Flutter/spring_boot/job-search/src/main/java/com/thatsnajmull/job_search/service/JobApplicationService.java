@@ -144,7 +144,7 @@ public class JobApplicationService {
     public String updateJobApplication(Long applicationId, JobApplicationEntity jobApplication) {
         Optional<JobApplicationEntity> existingJobApplication = jobApplicationRepository.findById(applicationId);
 
-        if (!existingJobApplication.isPresent()) {
+        if (existingJobApplication.isEmpty()) {
             return "Job application not found";
         }
 

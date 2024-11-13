@@ -19,6 +19,7 @@ class JobApplication {
   final String jobTypeApplied;
   final String locationPreference;
   final String positionLevel;
+  final String aplicantImage;
 
   JobApplication({
     required this.applicantName,
@@ -32,6 +33,7 @@ class JobApplication {
     required this.jobTypeApplied,
     required this.locationPreference,
     required this.positionLevel,
+    required this.aplicantImage,
   });
 
   factory JobApplication.fromJson(Map<String, dynamic> json) {
@@ -47,6 +49,7 @@ class JobApplication {
       jobTypeApplied: json['jobTypeApplied'],
       locationPreference: json['locationPreference'],
       positionLevel: json['positionLevel'],
+      aplicantImage: json['applicantImage'],
     );
   }
 }
@@ -184,6 +187,17 @@ class _ViewJobApplicationState extends State<ViewJobApplication> {
                         Text('Job Type Applied: ${application.jobTypeApplied}'),
                         Text('Location Preference: ${application.locationPreference}'),
                         Text('Position Level: ${application.positionLevel}'),
+                        // Show job logo/image if available
+                        // Show job logo/image if available
+                        application.aplicantImage != null && application.aplicantImage.isNotEmpty
+                            ? Image.network("http://localhost:8080/uploads/job-applications/" + application.aplicantImage)
+                            : Container(
+                          width: 100,
+                          height: 100,
+                          color: Colors.grey[200],
+                          child: Center(child: Text('No Image')),
+                        ),
+
 
                         // Button to download PDF
                         ElevatedButton(

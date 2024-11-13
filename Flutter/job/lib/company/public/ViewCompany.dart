@@ -70,6 +70,21 @@ class ViewCompanyState extends State<ViewCompany> {
                     Text('Address: ${company['companyAddress'] ?? 'N/A'}', style: TextStyle(fontSize: 16)),
                     SizedBox(height: 8),
                     Text('Employee Size: ${company['employeeSize'] ?? 'N/A'}', style: TextStyle(fontSize: 16)),
+
+                    // Show company image if available
+                    company['companyImage'] != null && company['companyImage'].isNotEmpty
+                        ? Image.network(
+                      "http://192.168.88.243:8080/uploads/companies/${company['companyImage']}",
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    )
+                        : Container(
+                      width: 100,
+                      height: 100,
+                      color: Colors.grey[200],
+                      child: Center(child: Text('No Image')),
+                    ),
                   ],
                 ),
               ),

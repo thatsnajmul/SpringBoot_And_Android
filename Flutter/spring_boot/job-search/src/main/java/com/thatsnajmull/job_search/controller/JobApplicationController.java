@@ -1,57 +1,65 @@
 package com.thatsnajmull.job_search.controller;
 
-import com.thatsnajmull.job_search.model.JobApplicationModel;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thatsnajmull.job_search.entity.JobApplicationEntity;
+import com.thatsnajmull.job_search.entity.JobEntity;
 import com.thatsnajmull.job_search.service.JobApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:9097")
-@RequestMapping("/jobapplications") // Base URL for all endpoints
+@RequestMapping("/api/job-applications")
 public class JobApplicationController {
 
     @Autowired
     private JobApplicationService jobApplicationService;
 
-    // Get all job applications
-    @GetMapping("/getall") // URL: /jobapplications/getall
-    public ResponseEntity<List<JobApplicationModel>> getAllJobApplications() {
-        List<JobApplicationModel> applications = jobApplicationService.getAllJobApplications();
-        return ResponseEntity.ok(applications); // Return applications with 200 OK
+    @GetMapping("/getall")
+    public ResponseEntity<List<JobApplicationEntity>> getAllJobApplications() {
+        List<JobApplicationEntity> applications = jobApplicationService.getAllJobApplications();
+        return ResponseEntity.ok(applications);
     }
 
-    // Get job application by ID
-    @GetMapping("/get/{applicationId}") // URL: /jobapplications/get/{id}
-    public ResponseEntity<JobApplicationModel> getJobApplicationById(@PathVariable Long applicationId) {
-        JobApplicationModel jobApplication = jobApplicationService.getJobApplicationById(applicationId);
-        return ResponseEntity.ok(jobApplication); // Return application if found
+    @GetMapping("/{applicationId}")
+    public ResponseEntity<JobApplicationEntity> getJobApplicationById(@PathVariable Long applicationId) {
+        try {
+            JobApplicationEntity application = jobApplicationService.getJobApplicationById(applicationId);
+            return ResponseEntity.ok(application);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
-    // Add a new job application
-    @PostMapping("/add") // URL: /jobapplications/add
-    public ResponseEntity<String> addJobApplication(@RequestBody JobApplicationModel jobApplication) {
-        String responseMessage = jobApplicationService.addJobApplication(jobApplication);
-        return responseMessage.equals("Job application added successfully")
-                ? ResponseEntity.status(HttpStatus.CREATED).body(responseMessage) // 201 Created
-                : ResponseEntity.status(HttpStatus.CONFLICT).body(responseMessage); // 409 Conflict
+    @PostMapping("/add")
+    public ResponseEntity<String> addJobApplication(
+            @RequestPart("jobApplication") String jobApplication,
+            @RequestPart(value = "applicantImage", required = false) MultipartFile applicantImage) throws JsonProcessingException {
+        JobApplicationEntity jobApplicationEntity = new ObjectMapper().readValue(jobApplication, JobApplicationEntity.class);
+        String response = jobApplicationService.addJobApplication(jobApplicationEntity, applicantImage);
+        return response.equals("Job application added successfully")
+                ? ResponseEntity.status(HttpStatus.CREATED).body(response)
+                : ResponseEntity.badRequest().body(response);
     }
 
-    // Update job application
-    @PutMapping("/update/{applicationId}") // URL: /jobapplications/update/{id}
-    public ResponseEntity<String> updateJobApplication(@PathVariable Long applicationId, @RequestBody JobApplicationModel jobApplication) {
-        jobApplication.setApplicationId(applicationId); // Set the ID from the path variable
-        String responseMessage = jobApplicationService.updateJobApplication(jobApplication);
-        return ResponseEntity.ok(responseMessage); // Return update response
+    @PutMapping("/{applicationId}")
+    public ResponseEntity<String> updateJobApplication(@PathVariable Long applicationId, @RequestBody JobApplicationEntity jobApplication) {
+        String response = jobApplicationService.updateJobApplication(applicationId, jobApplication);
+        return response.equals("Job application updated successfully")
+                ? ResponseEntity.ok(response)
+                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
-    // Remove job application by ID
-    @DeleteMapping("delete/{applicationId}") // URL: /jobapplications/delete/{id}
-    public ResponseEntity<String> removeJobApplication(@PathVariable Long applicationId) {
-        String responseMessage = jobApplicationService.removeJobApplication(applicationId);
-        return ResponseEntity.ok(responseMessage); // Return deletion response
+    @DeleteMapping("/{applicationId}")
+    public ResponseEntity<String> deleteJobApplication(@PathVariable Long applicationId) {
+        String response = jobApplicationService.removeJobApplication(applicationId);
+        return response.equals("Job application deleted successfully")
+                ? ResponseEntity.ok(response)
+                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 }

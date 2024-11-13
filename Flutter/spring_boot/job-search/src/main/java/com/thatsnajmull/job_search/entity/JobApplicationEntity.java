@@ -1,32 +1,39 @@
 package com.thatsnajmull.job_search.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 @Entity
 public class JobApplicationEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long applicationId;
 
     private String applicantName;
     private String applicantEmail;
     private String applicantPhone;
-    private String resumeLink; // Link to the applicant's resume or uploaded file path
-    private String applicationDate; // Date of application submission
-    private String applicationStatus; // e.g., "Pending", "Reviewed", "Interview Scheduled", "Rejected"
+    private String resumeLink;
+
+    @Temporal(TemporalType.DATE)
+    private Date applicationDate; // Changed to LocalDate
+    private String applicationStatus;
     private String coverLetter;
-    private String jobTitleApplied; // Title of the job the applicant applied for
-    private String skills; // Skills of the applicant relevant to the job
-    private String jobTypeApplied; // e.g., Full-time, Part-time, Contract
-    private String locationPreference; // Applicant's preferred job location
-    private String positionLevel; // e.g., Junior, Mid, Senior, Intern
+    private String jobTitleApplied;
+    private String skills;
+    private String jobTypeApplied;
+    private String locationPreference;
+    private String positionLevel;
+    private String applicantImage;
 
     public JobApplicationEntity() {}
 
     // Getters and Setters
+
     public Long getApplicationId() {
         return applicationId;
     }
@@ -67,11 +74,11 @@ public class JobApplicationEntity {
         this.resumeLink = resumeLink;
     }
 
-    public String getApplicationDate() {
+    public Date getApplicationDate() {
         return applicationDate;
     }
 
-    public void setApplicationDate(String applicationDate) {
+    public void setApplicationDate(Date applicationDate) {
         this.applicationDate = applicationDate;
     }
 
@@ -130,4 +137,13 @@ public class JobApplicationEntity {
     public void setPositionLevel(String positionLevel) {
         this.positionLevel = positionLevel;
     }
+
+    public String getApplicantImage() {
+        return applicantImage;
+    }
+
+    public void setApplicantImage(String applicantImage) {
+        this.applicantImage = applicantImage;
+    }
+
 }

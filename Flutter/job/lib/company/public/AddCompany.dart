@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:typed_data';
+import 'dart:html' as html;
+import 'package:http_parser/http_parser.dart';
 
 class AddCompany extends StatefulWidget {
   @override
@@ -17,9 +20,31 @@ class AddCompanyState extends State<AddCompany> {
   final TextEditingController companyPhoneController = TextEditingController();
   final TextEditingController companyAddressController = TextEditingController();
   final TextEditingController employeeSizeController = TextEditingController();
-  final TextEditingController companyImageController = TextEditingController(); // New controller for image URL
-
   final _formKey = GlobalKey<FormState>();
+  Uint8List? _imageData;
+  String? _imageName;
+
+  Future<void> _pickImage() async {
+    html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
+    uploadInput.accept = 'image/*';
+    uploadInput.click();
+
+    uploadInput.onChange.listen((event) {
+      final files = uploadInput.files;
+      if (files != null && files.isNotEmpty) {
+        final file = files[0];
+        final reader = html.FileReader();
+
+        reader.onLoadEnd.listen((event) {
+          setState(() {
+            _imageData = reader.result as Uint8List;
+            _imageName = file.name;
+          });
+        });
+        reader.readAsArrayBuffer(file);
+      }
+    });
+  }
 
   Future<void> _submitCompany() async {
     if (_formKey.currentState?.validate() == true) {
@@ -30,22 +55,41 @@ class AddCompanyState extends State<AddCompany> {
         'companyPhone': companyPhoneController.text,
         'companyAddress': companyAddressController.text,
         'employeeSize': int.tryParse(employeeSizeController.text) ?? 0,
-        'companyImage': companyImageController.text, // Adding the image URL to the request
       };
 
-      try {
-        final response = await http.post(
-          Uri.parse('http://localhost:8080/api/companies/add-company'), // Update with your API URL
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode(companyData),
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('http://localhost:8080/api/companies/add-company'),
+      );
+
+      request.fields['companyDetails'] = json.encode(companyData);
+
+      // Update: Use 'image' as the backend field name for the image
+      if (_imageData != null) {
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'image',  // Updated field name to match backend expectation
+            _imageData!,
+            filename: _imageName ?? 'company_image.jpg',
+            contentType: MediaType('image', 'jpeg'),
+          ),
         );
+      }
+
+      try {
+        final response = await request.send();
+
         if (response.statusCode == 200 || response.statusCode == 201) {
-          Navigator.pop(context); // Navigate back if successful
+          Navigator.pop(context);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to add company')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to add company: ${response.statusCode}')),
+          );
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
       }
     }
   }
@@ -55,7 +99,9 @@ class AddCompanyState extends State<AddCompany> {
     TextStyle? textStyle = Theme.of(context).textTheme.titleSmall;
 
     return Scaffold(
-      appBar: AppBar(title: Text("Add Company")),
+      appBar: AppBar(
+        title: Text("Add Company"),
+      ),
       body: Form(
         key: _formKey,
         child: Padding(
@@ -99,12 +145,18 @@ class AddCompanyState extends State<AddCompany> {
                 textStyle: textStyle,
                 keyboardType: TextInputType.number,
               ),
-              buildTextField(
-                controller: companyImageController, // Add image URL field
-                label: 'Company Image URL',
-                hint: 'Enter company image URL',
-                textStyle: textStyle,
+              Padding(
+                padding: EdgeInsets.only(top: minimumPadding),
+                child: ElevatedButton(
+                  child: Text('Pick Image'),
+                  onPressed: _pickImage,
+                ),
               ),
+              if (_imageData != null)
+                Padding(
+                  padding: EdgeInsets.only(top: minimumPadding),
+                  child: Image.memory(_imageData!, height: 150, width: 150),
+                ),
               Padding(
                 padding: EdgeInsets.only(top: minimumPadding),
                 child: ElevatedButton(

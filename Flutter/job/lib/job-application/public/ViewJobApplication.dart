@@ -68,7 +68,7 @@ class _ViewJobApplicationState extends State<ViewJobApplication> {
 
   Future<void> fetchApplications() async {
     try {
-      final response = await http.get(Uri.parse('http://localhost:8080/jobapplications/getall'));
+      final response = await http.get(Uri.parse('http://localhost:8080/api/job-applications/getall'));
       if (response.statusCode == 200) {
         List jsonResponse = json.decode(response.body);
         setState(() {

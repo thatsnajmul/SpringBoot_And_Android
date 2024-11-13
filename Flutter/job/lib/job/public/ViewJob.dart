@@ -159,8 +159,8 @@ class _ViewJobState extends State<ViewJob> {
                         Text(job.skills ?? 'No specific skills required'),
                         SizedBox(height: 10),
                         // Show job logo/image if available
-                        job.companyLogo != null && job.companyLogo!.isNotEmpty
-                            ? Image.network(job.companyLogo!)
+                        job.image != null && job.image!.isNotEmpty
+                            ? Image.network("http://localhost:8080/uploads/jobs/" + job.image!)
                             : Container(
                           width: 100,
                           height: 100,
@@ -251,7 +251,7 @@ class Job {
   final String? position;
   final String? skills;
   final String? companyName;
-  final String? companyLogo; // New field for image URL
+  final String? image; // New field for image URL
 
   Job({
     this.jobTitle,
@@ -263,7 +263,7 @@ class Job {
     this.position,
     this.skills,
     this.companyName,
-    this.companyLogo, // Add image URL field to constructor
+    this.image, // Add image URL field to constructor
   });
 
   factory Job.fromJson(Map<String, dynamic> json) {
@@ -277,7 +277,7 @@ class Job {
       position: json['position'] ?? 'Not specified',
       skills: json['skills'] ?? 'No specific skills required',
       companyName: json['companyName'] ?? 'Company name unavailable',
-      companyLogo: json['companyLogo'] ?? '', // Add the image URL to job object
+      image: json['image'] ?? '', // Add the image URL to job object
     );
   }
 }

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:typed_data';
+import 'dart:html' as html;
+import 'package:http_parser/http_parser.dart';
+import 'package:image/image.dart' as img;
+import 'package:intl/intl.dart';
 
 class AddJobApplication extends StatefulWidget {
   @override
@@ -11,8 +16,8 @@ class AddJobApplication extends StatefulWidget {
 
 class AddJobApplicationState extends State<AddJobApplication> {
   final double minimumPadding = 5.0;
+  final _formKey = GlobalKey<FormState>();
 
-  // Text editing controllers
   final TextEditingController applicantNameController = TextEditingController();
   final TextEditingController applicantEmailController = TextEditingController();
   final TextEditingController applicantPhoneController = TextEditingController();
@@ -25,50 +30,105 @@ class AddJobApplicationState extends State<AddJobApplication> {
   final TextEditingController locationPreferenceController = TextEditingController();
   final TextEditingController positionLevelController = TextEditingController();
 
-  final _formKey = GlobalKey<FormState>();
+  Uint8List? applicantImage;
+  String? imageName;
 
+  // Function to pick and resize image
+  Future<void> _pickImage() async {
+    html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
+    uploadInput.accept = 'image/*';
+    uploadInput.click();
+
+    uploadInput.onChange.listen((event) async {
+      final files = uploadInput.files;
+      if (files != null && files.isNotEmpty) {
+        final file = files[0];
+        final reader = html.FileReader();
+
+        reader.onLoadEnd.listen((event) async {
+          setState(() {
+            applicantImage = reader.result as Uint8List;
+            imageName = file.name;
+          });
+
+          // Resize image (optional size limits)
+          final img.Image image = img.decodeImage(applicantImage!)!;
+          final resizedImage = img.copyResize(image, width: 300); // Adjust the width here
+          applicantImage = Uint8List.fromList(img.encodeJpg(resizedImage)); // Convert back to Uint8List
+        });
+        reader.readAsArrayBuffer(file);
+      }
+    });
+  }
+
+  // Function to select application date
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null) {
+      setState(() {
+        // Format the selected date as yyyy-MM-dd
+        final formattedDate =
+            "${picked.year.toString()}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+        applicationDateController.text = formattedDate; // Store formatted date
+      });
+    }
+  }
+
+
+  // Function to submit job application
   Future<void> _submitJobApplication() async {
     if (_formKey.currentState?.validate() == true) {
-      // Prepare application data
       final applicationData = {
         'applicantName': applicantNameController.text,
         'applicantEmail': applicantEmailController.text,
         'applicantPhone': applicantPhoneController.text,
         'resumeLink': resumeLinkController.text,
-        'applicationDate': applicationDateController.text,
+        'applicationDate': applicationDateController.text,  // Direct date as string
         'coverLetter': coverLetterController.text,
         'jobTitleApplied': jobTitleAppliedController.text,
-        // Store skills as a single string
-        'skills': skillsController.text, // Directly use the input as a string
+        'skills': skillsController.text,
         'jobTypeApplied': jobTypeAppliedController.text,
         'locationPreference': locationPreferenceController.text,
         'positionLevel': positionLevelController.text,
       };
 
-      // Debug print to verify applicationData content
-      print("Application Data to be sent: ${json.encode(applicationData)}");
+      // Log application data to ensure it is formatted correctly
+      print("Sending data: ${jsonEncode(applicationData)}");
+
+      final uri = Uri.parse('http://localhost:8080/api/job-applications/add');
+      final request = http.MultipartRequest('POST', uri);
+      request.fields['jobApplication'] = jsonEncode(applicationData);
+
+      if (applicantImage != null && imageName != null) {
+        request.files.add(http.MultipartFile.fromBytes(
+          'applicantImage',
+          applicantImage!,
+          filename: imageName,
+          contentType: MediaType('image', 'jpeg'),
+        ));
+      }
 
       try {
-        final response = await http.post(
-          Uri.parse('http://localhost:8080/jobapplications/add'),
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode(applicationData),
-        );
+        final streamedResponse = await request.send();
+        final response = await http.Response.fromStream(streamedResponse);
 
-        print('Response status: ${response.statusCode}'); // Log status code
-        print('Response body: ${response.body}'); // Log response body
+        // Log the response status and body
+        print("Response Status: ${response.statusCode}");
+        print("Response Body: ${response.body}");
 
-        // Check if the response status is successful
-        if (response.statusCode == 200 || response.statusCode == 201) {
-          Navigator.pop(context); // Navigate back if successful
+        if (response.statusCode == 201) {
+          Navigator.pop(context);
         } else {
-          // Show error message if the response was not successful
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to add application: ${response.statusCode} - ${response.body}')),
+            SnackBar(content: Text('Failed: ${response.statusCode} - ${response.body}')),
           );
         }
       } catch (e) {
-        // Catch any other errors and display a SnackBar
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e')),
         );
@@ -91,78 +151,40 @@ class AddJobApplicationState extends State<AddJobApplication> {
           padding: EdgeInsets.all(minimumPadding * 2),
           child: ListView(
             children: <Widget>[
-              buildTextField(
-                controller: applicantNameController,
-                label: 'Applicant Name',
-                hint: 'Enter your name',
-                textStyle: textStyle,
+              buildTextField(applicantNameController, 'Applicant Name', 'Enter your name', textStyle),
+              buildTextField(applicantEmailController, 'Applicant Email', 'Enter your email', textStyle),
+              buildTextField(applicantPhoneController, 'Applicant Phone', 'Enter phone number', textStyle, keyboardType: TextInputType.phone),
+              buildTextField(resumeLinkController, 'Resume Link', 'Enter resume link', textStyle),
+              buildTextField(applicationDateController, 'Application Date', 'dd-MM-yy', textStyle),
+              ElevatedButton(
+                onPressed: () => _selectDate(context),
+                child: Text('Select Date'),
               ),
-              buildTextField(
-                controller: applicantEmailController,
-                label: 'Applicant Email',
-                hint: 'Enter your email',
-                textStyle: textStyle,
+              buildTextField(coverLetterController, 'Cover Letter', 'Enter cover letter', textStyle),
+              buildTextField(jobTitleAppliedController, 'Job Title', 'Enter job title', textStyle),
+              buildTextField(skillsController, 'Skills', 'Comma-separated skills', textStyle),
+              buildTextField(jobTypeAppliedController, 'Job Type', 'Full-time/Part-time', textStyle),
+              buildTextField(locationPreferenceController, 'Location', 'Preferred location', textStyle),
+              buildTextField(positionLevelController, 'Position Level', 'Junior/Senior', textStyle),
+              ElevatedButton(
+                onPressed: _pickImage,
+                child: Text('Pick Image'),
               ),
-              buildTextField(
-                controller: applicantPhoneController,
-                label: 'Applicant Phone',
-                hint: 'Enter your phone number',
-                textStyle: textStyle,
-                keyboardType: TextInputType.phone,
-              ),
-              buildTextField(
-                controller: resumeLinkController,
-                label: 'Resume Link',
-                hint: 'Enter link to your resume',
-                textStyle: textStyle,
-              ),
-              buildTextField(
-                controller: applicationDateController,
-                label: 'Application Date',
-                hint: 'Enter application date (YYYY-MM-DD)',
-                textStyle: textStyle,
-              ),
-              buildTextField(
-                controller: coverLetterController,
-                label: 'Cover Letter',
-                hint: 'Enter cover letter',
-                textStyle: textStyle,
-              ),
-              buildTextField(
-                controller: jobTitleAppliedController,
-                label: 'Job Title Applied',
-                hint: 'Enter job title you applied for',
-                textStyle: textStyle,
-              ),
-              buildTextField(
-                controller: skillsController,
-                label: 'Skills',
-                hint: 'Comma-separated list of skills',
-                textStyle: textStyle,
-              ),
-              buildTextField(
-                controller: jobTypeAppliedController,
-                label: 'Job Type Applied',
-                hint: 'e.g., Full-time, Part-time',
-                textStyle: textStyle,
-              ),
-              buildTextField(
-                controller: locationPreferenceController,
-                label: 'Location Preference',
-                hint: 'Enter preferred job location',
-                textStyle: textStyle,
-              ),
-              buildTextField(
-                controller: positionLevelController,
-                label: 'Position Level',
-                hint: 'e.g., Junior, Senior',
-                textStyle: textStyle,
-              ),
+              if (applicantImage != null) ...[
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10.0),
+                  child: Container(
+                    width: 150,
+                    height: 150,
+                    child: Image.memory(applicantImage!, fit: BoxFit.cover),
+                  ),
+                ),
+              ],
               Padding(
-                padding: EdgeInsets.only(top: minimumPadding),
+                padding: EdgeInsets.symmetric(vertical: minimumPadding),
                 child: ElevatedButton(
-                  child: Text('Submit'),
                   onPressed: _submitJobApplication,
+                  child: Text('Submit'),
                 ),
               ),
             ],
@@ -172,33 +194,21 @@ class AddJobApplicationState extends State<AddJobApplication> {
     );
   }
 
-  Widget buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    TextStyle? textStyle,
-    TextInputType keyboardType = TextInputType.text,
-  }) {
+  // Helper function for building text fields
+  Widget buildTextField(TextEditingController controller, String label, String hint, TextStyle? style, {TextInputType? keyboardType}) {
     return Padding(
-      padding: EdgeInsets.only(top: minimumPadding, bottom: minimumPadding),
+      padding: EdgeInsets.symmetric(vertical: minimumPadding),
       child: TextFormField(
-        style: textStyle,
         controller: controller,
-        validator: (String? value) {
+        decoration: InputDecoration(labelText: label, hintText: hint),
+        style: style,
+        keyboardType: keyboardType,
+        validator: (value) {
           if (value == null || value.isEmpty) {
-            return 'Please enter $label';
+            return 'This field is required';
           }
           return null;
         },
-        decoration: InputDecoration(
-          labelText: label,
-          hintText: hint,
-          labelStyle: textStyle,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(5.0),
-          ),
-        ),
-        keyboardType: keyboardType,
       ),
     );
   }

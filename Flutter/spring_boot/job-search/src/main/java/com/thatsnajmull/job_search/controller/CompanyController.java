@@ -1,18 +1,25 @@
 package com.thatsnajmull.job_search.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thatsnajmull.job_search.entity.CompanyEntity;
 import com.thatsnajmull.job_search.service.CompanyService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:9097")  // Enable CORS for the given frontend URL
 @RequestMapping("api/companies")  // Simplified URL for consistency
 public class CompanyController {
+
+    private final Logger logger = LoggerFactory.getLogger(CompanyController.class);
 
     @Autowired
     private CompanyService companyService;
@@ -35,26 +42,54 @@ public class CompanyController {
         }
     }
 
-    // Add a new company
+    // Add a new company with image
     @PostMapping("/add-company")
-    public ResponseEntity<String> addCompany(@RequestBody CompanyEntity company) {
-        String response = companyService.addCompany(company);
-        if (response.contains("successfully")) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);  // 201 Created when company is successfully added
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);  // 409 Conflict if company already exists
+    public ResponseEntity<String> addCompany(@RequestParam("companyDetails") String companyDetails,
+                                             @RequestParam("image") MultipartFile image) {
+        try {
+            // Parse JSON string to CompanyEntity object
+            CompanyEntity company = new ObjectMapper().readValue(companyDetails, CompanyEntity.class);
+
+            // Save the image and set its filename in the entity
+            String imageName = companyService.saveImage(image);
+            company.setCompanyImage(imageName);
+
+            // Add company to the database
+            String response = companyService.addCompany(company, image);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);  // 201 Created for successful addition
+
+        } catch (IOException e) {
+            logger.error("Error saving image or parsing company details: " + e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: Could not process image or company details.");
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid image file: " + e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Client error: Invalid image file.");
         }
     }
 
-    // Update an existing company
+    // Update an existing company with optional image
     @PutMapping("/update/{companyId}")
-    public ResponseEntity<String> updateCompany(@PathVariable Long companyId, @RequestBody CompanyEntity company) {
-        company.setCompanyId(companyId);  // Corrected this line to set the ID properly
-        String response = companyService.updateCompany(company);
-        if (response.contains("updated")) {
-            return ResponseEntity.ok(response);  // 200 OK if company is updated successfully
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);  // 404 Not Found if company does not exist
+    public ResponseEntity<String> updateCompany(@PathVariable Long companyId,
+                                                @RequestParam("companyDetails") String companyDetails,
+                                                @RequestParam(value = "image", required = false) MultipartFile image) {
+        try {
+            // Parse JSON string to CompanyEntity object
+            CompanyEntity company = new ObjectMapper().readValue(companyDetails, CompanyEntity.class);
+            company.setCompanyId(companyId);
+
+            if (image != null && !image.isEmpty()) {
+                // Save the image and update the filename
+                String imageName = companyService.saveImage(image);
+                company.setCompanyImage(imageName); // Update image filename in entity
+            }
+
+            // Update company in database
+            String response = companyService.updateCompany(company, image);
+            return ResponseEntity.ok(response);  // 200 OK if update is successful
+
+        } catch (IOException e) {
+            logger.error("Error saving image or parsing company details: " + e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: Could not process image or company details.");
         }
     }
 

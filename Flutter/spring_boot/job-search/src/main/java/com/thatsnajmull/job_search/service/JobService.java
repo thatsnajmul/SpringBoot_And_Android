@@ -5,6 +5,7 @@ import com.thatsnajmull.job_search.repository.JobRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,11 +20,11 @@ import java.util.Optional;
 @Service
 public class JobService {
 
+    @Value("${uploads.dir}")
+    private String uploads;
+
     @Autowired
     private JobRepository jobRepository;
-
-    // Directory to save uploaded images (adjust the path as needed)
-    private final String imageUploadDir = "uploads"; // Can be configured in properties file
 
     // Logger for error handling
     private final Logger logger = LoggerFactory.getLogger(JobService.class);
@@ -49,7 +50,7 @@ public class JobService {
         String newFilename = System.currentTimeMillis() + "_" + originalFilename;
 
         // Create the image file path
-        Path imagePath = Paths.get(imageUploadDir, newFilename);
+        Path imagePath = Paths.get(uploads+ "/jobs", newFilename);
 
         // Ensure the directory exists
         Files.createDirectories(imagePath.getParent());
@@ -117,7 +118,7 @@ public class JobService {
     // Optionally, you can add logic to delete the image file from the disk when removing or updating jobs.
     public void deleteImage(String imageFilename) throws IOException {
         if (imageFilename != null && !imageFilename.isEmpty()) {
-            Path imagePath = Paths.get(imageUploadDir, imageFilename);
+            Path imagePath = Paths.get(uploads + "/companies", imageFilename);
             Files.deleteIfExists(imagePath);
         }
     }

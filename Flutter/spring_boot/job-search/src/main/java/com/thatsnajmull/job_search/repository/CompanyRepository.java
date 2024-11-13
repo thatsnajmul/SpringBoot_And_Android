@@ -20,6 +20,7 @@ public interface CompanyRepository extends JpaRepository<CompanyEntity, Long> {
             String companyDetails,
             int employeeSize
     );
+    boolean existsById(Long companyId);
 }
 
 

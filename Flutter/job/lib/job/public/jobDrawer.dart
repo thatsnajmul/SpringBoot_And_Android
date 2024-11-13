@@ -7,7 +7,6 @@ import 'package:job/job-application/admin/AdminViewJobApplication.dart';
 import 'package:job/job-application/public/ViewJobApplication.dart';
 import 'package:job/job/admin/AdminViewJob.dart';
 import 'package:job/LoginReg/RegisterScreen.dart';
-import 'package:job/job/admin/addJobWithImage.dart';
 import 'package:job/job/public/addJob.dart';
 
 
@@ -126,7 +125,6 @@ class JobDrawer extends StatelessWidget {
               );
             },
           ),
-
 
 
         ],

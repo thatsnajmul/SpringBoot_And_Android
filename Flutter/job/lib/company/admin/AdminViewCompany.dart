@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../public/ViewCompany.dart';
-import 'UpdateCompany.dart'; // Ensure this file exists and is properly implemented
+import 'UpdateCompany.dart'; // Ensure UpdateCompany.dart is imported
 
 class Company {
+  final String companyId;
   final String companyName;
   final String companyEmail;
   final String companyPhone;
@@ -14,6 +14,7 @@ class Company {
   final String employeeSize;
 
   Company({
+    required this.companyId,
     required this.companyName,
     required this.companyEmail,
     required this.companyPhone,
@@ -25,17 +26,18 @@ class Company {
 
   factory Company.fromJson(Map<String, dynamic> json) {
     return Company(
+      companyId: json['_id'] ?? '', // Assuming _id is used as companyId
       companyName: json['companyName'] ?? '',
       companyEmail: json['companyEmail'] ?? '',
       companyPhone: json['companyPhone'] ?? '',
       companyAddress: json['companyAddress'] ?? '',
       companyDetails: json['companyDetails'] ?? '',
-      companyImage: json['companyImage']?.toString() ?? '',
-      employeeSize: (json['employeeSize'] is int ? json['employeeSize'].toString() : json['employeeSize'] ?? ''),
+      companyImage: json['companyImage'] ?? '',
+      employeeSize: (json['employeeSize'] is int
+          ? json['employeeSize'].toString()
+          : json['employeeSize'] ?? ''),
     );
   }
-
-  get companyId => null;
 }
 
 class AdminViewCompany extends StatefulWidget {
@@ -60,7 +62,6 @@ class _AdminViewCompanyState extends State<AdminViewCompany> {
       final response = await http.get(Uri.parse('http://localhost:8080/api/companies/get-all-companies'));
 
       if (response.statusCode == 200) {
-        // Decode the response and convert it to a list of Company objects
         List<dynamic> jsonResponse = json.decode(response.body);
         setState(() {
           companies = jsonResponse.map((companyData) => Company.fromJson(companyData)).toList();
@@ -77,7 +78,6 @@ class _AdminViewCompanyState extends State<AdminViewCompany> {
         errorMessage = 'Error: $e';
         isLoading = false;
       });
-      print("Error fetching companies: $e");
     }
   }
 
@@ -87,28 +87,22 @@ class _AdminViewCompanyState extends State<AdminViewCompany> {
       final response = await http.delete(Uri.parse('http://localhost:8080/api/companies/delete/$companyId'));
 
       if (response.statusCode == 200 || response.statusCode == 204) {
-        // If status code is 200 or 204, assume deletion is successful
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Company deleted successfully!')));
         fetchCompanies(); // Refresh the company list
       } else {
-        // Handle failure case
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to delete company. Status: ${response.statusCode}')));
-        print('Failed to delete company: ${response.body}');
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
-      print('Error deleting company: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('All Companies'),
-      ),
+      appBar: AppBar(title: Text('All Companies')),
       body: isLoading
-          ? Center(child: CircularProgressIndicator()) // Show loading indicator if data is empty
+          ? Center(child: CircularProgressIndicator())
           : errorMessage.isNotEmpty
           ? Center(child: Text(errorMessage))
           : companies.isEmpty
@@ -121,7 +115,6 @@ class _AdminViewCompanyState extends State<AdminViewCompany> {
           return CompanyTile(
             company: company,
             onEdit: () {
-              // Pass companyId to UpdateCompany screen
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -138,13 +131,13 @@ class _AdminViewCompanyState extends State<AdminViewCompany> {
                   actions: [
                     TextButton(
                       onPressed: () {
-                        Navigator.pop(context, false); // Cancels the action
+                        Navigator.pop(context, false);
                       },
                       child: Text('Cancel'),
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.pop(context, true); // Confirms the action
+                        Navigator.pop(context, true);
                       },
                       child: Text('Delete'),
                     ),

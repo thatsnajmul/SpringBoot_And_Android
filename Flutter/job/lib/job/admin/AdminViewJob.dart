@@ -89,6 +89,7 @@ class _ViewJobState extends State<AdminViewJob> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Job Listings'),
+        backgroundColor: Colors.deepPurpleAccent,
         actions: [
           PopupMenuButton<String>(
             onSelected: _sortJobs,
@@ -106,14 +107,14 @@ class _ViewJobState extends State<AdminViewJob> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(16.0),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
                 labelText: 'Search by job title',
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
+                  borderRadius: BorderRadius.circular(12.0),
                 ),
               ),
             ),
@@ -122,99 +123,132 @@ class _ViewJobState extends State<AdminViewJob> {
             child: _isLoading
                 ? Center(child: CircularProgressIndicator())
                 : _error.isNotEmpty
-                ? Center(child: Text(_error))
+                ? Center(child: Text(_error, style: TextStyle(color: Colors.red, fontSize: 16)))
                 : ListView.builder(
               itemCount: _filteredJobs.length,
               itemBuilder: (context, index) {
                 final job = _filteredJobs[index];
-                return Card(
-                  margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: ListTile(
-                      contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-                      isThreeLine: true,
-                      leading: job.image != null && job.image!.isNotEmpty
-                          ? GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => FullScreenImageView(imageUrl: 'http://localhost:8080/uploads/jobs/' + job.image!),
-                            ),
-                          );
-                        },
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8.0),
-                          child: Image.network(
-                            'http://localhost:8080/uploads/jobs/' + job.image!,
-                            width: 60,
-                            height: 60,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      )
-                          : Icon(Icons.business_center, size: 60, color: Colors.grey),
-                      title: Text(
-                        job.jobTitle ?? 'Job Title Unavailable',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 4.0),
-                          Text(
-                            'Company: ${job.companyName ?? 'Company not specified'}',
-                            style: TextStyle(color: Colors.black54),
-                          ),
-                          Text(
-                            'Location: ${job.location ?? 'Location not specified'}',
-                            style: TextStyle(color: Colors.black54),
-                          ),
-                          Text(
-                            'Salary: \$${job.salary?.toStringAsFixed(2) ?? 'Not specified'}',
-                            style: TextStyle(color: Colors.black54),
-                          ),
-                        ],
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => UpdateJob(id: job.id),
-                                ),
-                              ).then((_) => _fetchJobs());
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
-                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                            ),
-                            child: Text('Edit', style: TextStyle(fontSize: 14)),
-                          ),
-                          SizedBox(width: 8.0), // Space between the buttons
-                          ElevatedButton(
-                            onPressed: () => _deleteJob(job.id),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                            ),
-                            child: Text('Delete', style: TextStyle(fontSize: 14)),
-                          ),
-                        ],
-                      ),
+                return JobCard(job: job, onDelete: () => _deleteJob(job.id), onEdit: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UpdateJob(id: job.id),
                     ),
-                  ),
-                );
+                  ).then((_) => _fetchJobs());
+                });
               },
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class JobCard extends StatelessWidget {
+  final Job job;
+  final VoidCallback onDelete;
+  final VoidCallback onEdit;
+
+  const JobCard({
+    required this.job,
+    required this.onDelete,
+    required this.onEdit,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: ListTile(
+          contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+          isThreeLine: true,
+          leading: job.image != null && job.image!.isNotEmpty
+              ? GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FullScreenImageView(imageUrl: 'http://localhost:8080/uploads/jobs/' + job.image!),
+                ),
+              );
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: Image.network(
+                'http://localhost:8080/uploads/jobs/' + job.image!,
+                width: 60,
+                height: 60,
+                fit: BoxFit.cover,
+              ),
+            ),
+          )
+              : Icon(Icons.business_center, size: 60, color: Colors.grey),
+          title: Text(
+            job.jobTitle ?? 'Job Title Unavailable',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 4.0),
+              Text(
+                'Company: ${job.companyName ?? 'Company not specified'}',
+                style: TextStyle(color: Colors.black54),
+              ),
+              Text(
+                'Location: ${job.location ?? 'Location not specified'}',
+                style: TextStyle(color: Colors.black54),
+              ),
+              Text(
+                'Salary: \$${job.salary?.toStringAsFixed(2) ?? 'Not specified'}',
+                style: TextStyle(color: Colors.black54),
+              ),
+              Text(
+                'Position: ${job.position ?? 'Not specified'}',
+                style: TextStyle(color: Colors.black54),
+              ),
+              Text(
+                'Job Type: ${job.jobType ?? 'Not specified'}',
+                style: TextStyle(color: Colors.black54),
+              ),
+              Text(
+                'Skills: ${job.skills ?? 'No specific skills required'}',
+                style: TextStyle(color: Colors.black54),
+              ),
+              Text(
+                'Requirements: ${job.requirements ?? 'No requirements specified'}',
+                style: TextStyle(color: Colors.black54),
+              ),
+            ],
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton(
+                onPressed: onEdit,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                ),
+                child: Text('Edit', style: TextStyle(fontSize: 14)),
+              ),
+              SizedBox(width: 8.0), // Space between the buttons
+              ElevatedButton(
+                onPressed: onDelete,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                ),
+                child: Text('Delete', style: TextStyle(fontSize: 14)),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

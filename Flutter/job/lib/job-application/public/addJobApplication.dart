@@ -5,7 +5,6 @@ import 'dart:typed_data';
 import 'dart:html' as html;
 import 'package:http_parser/http_parser.dart';
 import 'package:image/image.dart' as img;
-import 'package:intl/intl.dart';
 
 class AddJobApplication extends StatefulWidget {
   @override
@@ -15,7 +14,7 @@ class AddJobApplication extends StatefulWidget {
 }
 
 class AddJobApplicationState extends State<AddJobApplication> {
-  final double minimumPadding = 5.0;
+  final double minimumPadding = 10.0;
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController applicantNameController = TextEditingController();
@@ -79,7 +78,6 @@ class AddJobApplicationState extends State<AddJobApplication> {
     }
   }
 
-
   // Function to submit job application
   Future<void> _submitJobApplication() async {
     if (_formKey.currentState?.validate() == true) {
@@ -136,7 +134,6 @@ class AddJobApplicationState extends State<AddJobApplication> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     TextStyle? textStyle = Theme.of(context).textTheme.titleSmall;
@@ -144,6 +141,7 @@ class AddJobApplicationState extends State<AddJobApplication> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Add Job Application"),
+        backgroundColor: Colors.deepPurpleAccent,
       ),
       body: Form(
         key: _formKey,
@@ -155,10 +153,15 @@ class AddJobApplicationState extends State<AddJobApplication> {
               buildTextField(applicantEmailController, 'Applicant Email', 'Enter your email', textStyle),
               buildTextField(applicantPhoneController, 'Applicant Phone', 'Enter phone number', textStyle, keyboardType: TextInputType.phone),
               buildTextField(resumeLinkController, 'Resume Link', 'Enter resume link', textStyle),
-              buildTextField(applicationDateController, 'Application Date', 'dd-MM-yy', textStyle),
+              buildTextField(applicationDateController, 'Application Date', 'Select date', textStyle),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 16.0),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
                 onPressed: () => _selectDate(context),
-                child: Text('Select Date'),
+                child: Text('Select Date', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
               buildTextField(coverLetterController, 'Cover Letter', 'Enter cover letter', textStyle),
               buildTextField(jobTitleAppliedController, 'Job Title', 'Enter job title', textStyle),
@@ -166,9 +169,15 @@ class AddJobApplicationState extends State<AddJobApplication> {
               buildTextField(jobTypeAppliedController, 'Job Type', 'Full-time/Part-time', textStyle),
               buildTextField(locationPreferenceController, 'Location', 'Preferred location', textStyle),
               buildTextField(positionLevelController, 'Position Level', 'Junior/Senior', textStyle),
+              SizedBox(height: minimumPadding),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  padding: EdgeInsets.symmetric(vertical: 16.0),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
                 onPressed: _pickImage,
-                child: Text('Pick Image'),
+                child: Text('Pick Profile Image', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
               if (applicantImage != null) ...[
                 Padding(
@@ -176,15 +185,27 @@ class AddJobApplicationState extends State<AddJobApplication> {
                   child: Container(
                     width: 150,
                     height: 150,
-                    child: Image.memory(applicantImage!, fit: BoxFit.cover),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [BoxShadow(color: Colors.grey, blurRadius: 5)],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.memory(applicantImage!, fit: BoxFit.cover),
+                    ),
                   ),
                 ),
               ],
               Padding(
                 padding: EdgeInsets.symmetric(vertical: minimumPadding),
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    padding: EdgeInsets.symmetric(vertical: 16.0),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
                   onPressed: _submitJobApplication,
-                  child: Text('Submit'),
+                  child: Text('Submit Application', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -194,13 +215,25 @@ class AddJobApplicationState extends State<AddJobApplication> {
     );
   }
 
-  // Helper function for building text fields
+  // Helper function for building text fields with custom style
   Widget buildTextField(TextEditingController controller, String label, String hint, TextStyle? style, {TextInputType? keyboardType}) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: minimumPadding),
       child: TextFormField(
         controller: controller,
-        decoration: InputDecoration(labelText: label, hintText: hint),
+        decoration: InputDecoration(
+          labelText: label,
+          hintText: hint,
+          labelStyle: TextStyle(color: Colors.deepPurpleAccent),
+          hintStyle: TextStyle(color: Colors.grey),
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.deepPurpleAccent, width: 2),
+          ),
+          contentPadding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0),
+        ),
         style: style,
         keyboardType: keyboardType,
         validator: (value) {

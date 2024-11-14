@@ -1,7 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../public/ViewCompany.dart';
 import 'UpdateCompany.dart'; // Ensure this file exists and is properly implemented
+
+class Company {
+  final String companyName;
+  final String companyEmail;
+  final String companyPhone;
+  final String companyAddress;
+  final String companyDetails;
+  final String companyImage;
+  final String employeeSize;
+
+  Company({
+    required this.companyName,
+    required this.companyEmail,
+    required this.companyPhone,
+    required this.companyAddress,
+    required this.companyDetails,
+    required this.companyImage,
+    required this.employeeSize,
+  });
+
+  factory Company.fromJson(Map<String, dynamic> json) {
+    return Company(
+      companyName: json['companyName'] ?? '',
+      companyEmail: json['companyEmail'] ?? '',
+      companyPhone: json['companyPhone'] ?? '',
+      companyAddress: json['companyAddress'] ?? '',
+      companyDetails: json['companyDetails'] ?? '',
+      companyImage: json['companyImage']?.toString() ?? '',
+      employeeSize: (json['employeeSize'] is int ? json['employeeSize'].toString() : json['employeeSize'] ?? ''),
+    );
+  }
+
+  get companyId => null;
+}
 
 class AdminViewCompany extends StatefulWidget {
   @override
@@ -9,7 +44,7 @@ class AdminViewCompany extends StatefulWidget {
 }
 
 class _AdminViewCompanyState extends State<AdminViewCompany> {
-  List<dynamic> companies = [];
+  List<Company> companies = [];
   bool isLoading = true;
   String errorMessage = '';
 
@@ -25,8 +60,10 @@ class _AdminViewCompanyState extends State<AdminViewCompany> {
       final response = await http.get(Uri.parse('http://localhost:8080/api/companies/get-all-companies'));
 
       if (response.statusCode == 200) {
+        // Decode the response and convert it to a list of Company objects
+        List<dynamic> jsonResponse = json.decode(response.body);
         setState(() {
-          companies = json.decode(response.body); // Decode the response and set the companies list
+          companies = jsonResponse.map((companyData) => Company.fromJson(companyData)).toList();
           isLoading = false;
         });
       } else {
@@ -80,16 +117,15 @@ class _AdminViewCompanyState extends State<AdminViewCompany> {
         itemCount: companies.length,
         itemBuilder: (context, index) {
           final company = companies[index];
-          final companyId = company['companyId'].toString();
 
-          return CompanyCard(
+          return CompanyTile(
             company: company,
             onEdit: () {
               // Pass companyId to UpdateCompany screen
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => UpdateCompany(companyId: companyId),
+                  builder: (context) => UpdateCompany(companyId: company.companyId),
                 ),
               ).then((_) => fetchCompanies()); // Refresh companies on return
             },
@@ -117,7 +153,7 @@ class _AdminViewCompanyState extends State<AdminViewCompany> {
               );
 
               if (shouldDelete == true) {
-                deleteCompany(companyId); // Pass companyId to delete
+                deleteCompany(company.companyId); // Pass companyId to delete
               }
             },
           );
@@ -127,12 +163,12 @@ class _AdminViewCompanyState extends State<AdminViewCompany> {
   }
 }
 
-class CompanyCard extends StatelessWidget {
-  final dynamic company;
+class CompanyTile extends StatelessWidget {
+  final Company company;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
-  const CompanyCard({
+  const CompanyTile({
     required this.company,
     required this.onEdit,
     required this.onDelete,
@@ -141,40 +177,54 @@ class CompanyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.all(10),
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
+      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: ListTile(
+        contentPadding: EdgeInsets.all(16),
+        leading: company.companyImage.isNotEmpty
+            ? ClipRRect(
+          borderRadius: BorderRadius.circular(8.0),
+          child: Image.network(
+            "http://localhost:8080/uploads/companies/" + company.companyImage,
+            width: 80,
+            height: 80,
+            fit: BoxFit.cover,
+          ),
+        )
+            : Icon(Icons.business, size: 50, color: Colors.grey), // Fallback for missing image
+        title: Text(
+          company.companyName,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              company['companyName'] ?? 'N/A',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text('Email: ${company.companyEmail}', style: TextStyle(color: Colors.grey[600])),
+            Text('Phone: ${company.companyPhone}', style: TextStyle(color: Colors.grey[600])),
+            Text('Size: ${company.employeeSize} employees', style: TextStyle(color: Colors.grey[600])),
+            Text('Address: ${company.companyAddress}', style: TextStyle(color: Colors.grey[600])),
+            Text('Details: ${company.companyDetails}', style: TextStyle(color: Colors.grey[600])),
+          ],
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              onPressed: onEdit,
+              icon: Icon(Icons.edit, color: Colors.blue),
+              tooltip: 'Edit Company',
             ),
-            SizedBox(height: 8),
-            Text('Email: ${company['companyEmail'] ?? 'N/A'}'),
-            Text('Phone: ${company['companyPhone'] ?? 'N/A'}'),
-            Text('Details: ${company['companyDetails'] ?? 'N/A'}'),
-            Text('Address: ${company['companyAddress'] ?? 'N/A'}'),
-            Text('Employee: ${company['employeeSize'] ?? 'N/A'}'),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  onPressed: onEdit,
-                  child: Text('Edit'),
-                ),
-                ElevatedButton(
-                  onPressed: onDelete,
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                  child: Text('Delete'),
-                ),
-              ],
+            IconButton(
+              onPressed: onDelete,
+              icon: Icon(Icons.delete, color: Colors.red),
+              tooltip: 'Delete Company',
             ),
           ],
         ),
+        onTap: () {
+          // Optionally, you can navigate to a detail view on tap
+        },
       ),
     );
   }

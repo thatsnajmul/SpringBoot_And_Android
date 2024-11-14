@@ -13,7 +13,7 @@ class AddCompany extends StatefulWidget {
 }
 
 class AddCompanyState extends State<AddCompany> {
-  final double minimumPadding = 5.0;
+  final double minimumPadding = 8.0;
   final TextEditingController companyNameController = TextEditingController();
   final TextEditingController companyDetailsController = TextEditingController();
   final TextEditingController companyEmailController = TextEditingController();
@@ -24,6 +24,7 @@ class AddCompanyState extends State<AddCompany> {
   Uint8List? _imageData;
   String? _imageName;
 
+  // Function to pick an image from file input
   Future<void> _pickImage() async {
     html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
     uploadInput.accept = 'image/*';
@@ -46,6 +47,7 @@ class AddCompanyState extends State<AddCompany> {
     });
   }
 
+  // Function to submit the company form
   Future<void> _submitCompany() async {
     if (_formKey.currentState?.validate() == true) {
       final companyData = {
@@ -64,7 +66,6 @@ class AddCompanyState extends State<AddCompany> {
 
       request.fields['companyDetails'] = json.encode(companyData);
 
-      // Update: Use 'image' as the backend field name for the image
       if (_imageData != null) {
         request.files.add(
           http.MultipartFile.fromBytes(
@@ -101,6 +102,7 @@ class AddCompanyState extends State<AddCompany> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Add Company"),
+        backgroundColor: Colors.blueAccent,
       ),
       body: Form(
         key: _formKey,
@@ -145,24 +147,48 @@ class AddCompanyState extends State<AddCompany> {
                 textStyle: textStyle,
                 keyboardType: TextInputType.number,
               ),
-              Padding(
-                padding: EdgeInsets.only(top: minimumPadding),
-                child: ElevatedButton(
-                  child: Text('Pick Image'),
-                  onPressed: _pickImage,
+              SizedBox(height: minimumPadding),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  padding: EdgeInsets.symmetric(vertical: 16.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
                 ),
+                child: Text(
+                  'Pick Image',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                onPressed: _pickImage,
               ),
               if (_imageData != null)
                 Padding(
                   padding: EdgeInsets.only(top: minimumPadding),
-                  child: Image.memory(_imageData!, height: 150, width: 150),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.memory(
+                      _imageData!,
+                      height: 150,
+                      width: 150,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
-              Padding(
-                padding: EdgeInsets.only(top: minimumPadding),
-                child: ElevatedButton(
-                  child: Text('Submit'),
-                  onPressed: _submitCompany,
+              SizedBox(height: minimumPadding),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  padding: EdgeInsets.symmetric(vertical: 16.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
                 ),
+                child: Text(
+                  'Submit Company',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                onPressed: _submitCompany,
               ),
             ],
           ),
@@ -193,9 +219,14 @@ class AddCompanyState extends State<AddCompany> {
           labelText: label,
           hintText: hint,
           labelStyle: textStyle,
+          hintStyle: TextStyle(color: Colors.grey),
+          filled: true,
+          fillColor: Colors.blueGrey[50],
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(5.0),
+            borderRadius: BorderRadius.circular(10.0),
+            borderSide: BorderSide.none,
           ),
+          contentPadding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 16.0),
         ),
         keyboardType: keyboardType,
       ),

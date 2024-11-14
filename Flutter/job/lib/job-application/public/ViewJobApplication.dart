@@ -62,6 +62,9 @@ class ViewJobApplication extends StatefulWidget {
 class _ViewJobApplicationState extends State<ViewJobApplication> {
   String errorMessage = '';
   List<JobApplication> applications = [];
+  List<JobApplication> filteredApplications = [];
+  String searchQuery = '';
+  String selectedFilter = 'All';
 
   @override
   void initState() {
@@ -76,6 +79,7 @@ class _ViewJobApplicationState extends State<ViewJobApplication> {
         List jsonResponse = json.decode(response.body);
         setState(() {
           applications = jsonResponse.map((data) => JobApplication.fromJson(data)).toList();
+          filteredApplications = applications;
         });
       } else {
         throw Exception('Failed to load applications');
@@ -87,12 +91,37 @@ class _ViewJobApplicationState extends State<ViewJobApplication> {
     }
   }
 
+  // Method to filter applications based on selected filter option
+  void filterApplications(String filter) {
+    setState(() {
+      selectedFilter = filter;
+      if (filter == 'All') {
+        filteredApplications = applications;
+      } else {
+        filteredApplications = applications.where((app) {
+          return app.jobTypeApplied == filter || app.locationPreference == filter || app.positionLevel == filter;
+        }).toList();
+      }
+    });
+  }
+
+  // Method to search applications based on search query
+  void searchApplications(String query) {
+    setState(() {
+      searchQuery = query;
+      filteredApplications = applications
+          .where((app) => app.applicantName.toLowerCase().contains(query.toLowerCase()) ||
+          app.jobTitleApplied.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
+  }
+
   // Method to generate the PDF document
   Future<pw.Document> generatePDF() async {
     final pdf = pw.Document();
 
     // Add pages for each job application
-    for (var application in applications) {
+    for (var application in filteredApplications) {
       pdf.addPage(
         pw.Page(
           build: (pw.Context context) {
@@ -165,51 +194,119 @@ class _ViewJobApplicationState extends State<ViewJobApplication> {
                 padding: const EdgeInsets.only(top: 10),
                 child: Text(errorMessage, style: TextStyle(color: Colors.red)),
               ),
+            // Search Bar
+            TextField(
+              onChanged: searchApplications,
+              decoration: InputDecoration(
+                labelText: 'Search Applicants',
+                border: OutlineInputBorder(),
+                suffixIcon: Icon(Icons.search),
+              ),
+            ),
             SizedBox(height: 20),
+            // Filter Dropdown
+            DropdownButton<String>(
+              value: selectedFilter,
+              onChanged: (value) {
+                if (value != null) {
+                  filterApplications(value);
+                }
+              },
+              items: <String>['All', 'Full-time', 'Part-time', 'Remote', 'Internship']
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
+            SizedBox(height: 20),
+            // List of Job Applications
             Expanded(
               child: ListView.separated(
-                itemCount: applications.length,
+                itemCount: filteredApplications.length,
                 itemBuilder: (context, index) {
-                  final application = applications[index];
-                  return ListTile(
-                    title: Text(application.applicantName),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Applicant Name: ${application.applicantName}'),
-                        Text('Applicant Email: ${application.applicantEmail}'),
-                        Text('Phone: ${application.applicantPhone}'),
-                        Text('Resume Link: ${application.resumeLink}'),
-                        Text('Application Date: ${application.applicationDate}'),
-                        Text('Cover Letter: ${application.coverLetter}'),
-                        Text('Job Title Applied: ${application.jobTitleApplied}'),
-                        Text('Skills: ${application.skills}'),
-                        Text('Job Type Applied: ${application.jobTypeApplied}'),
-                        Text('Location Preference: ${application.locationPreference}'),
-                        Text('Position Level: ${application.positionLevel}'),
-                        // Show job logo/image if available
-                        // Show job logo/image if available
-                        application.aplicantImage != null && application.aplicantImage.isNotEmpty
-                            ? Image.network("http://localhost:8080/uploads/job-applications/" + application.aplicantImage)
-                            : Container(
-                          width: 100,
-                          height: 100,
-                          color: Colors.grey[200],
-                          child: Center(child: Text('No Image')),
-                        ),
-
-
-                        // Button to download PDF
-                        ElevatedButton(
-                          onPressed: generateAndDownloadPDF,
-                          child: Text('Download as PDF'),
-                        ),
-                        // Button to print PDF
-                        ElevatedButton(
-                          onPressed: printPDF,
-                          child: Text('Print'),
-                        ),
-                      ],
+                  final application = filteredApplications[index];
+                  return Card(
+                    margin: EdgeInsets.symmetric(vertical: 8.0),
+                    elevation: 4.0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    child: ListTile(
+                      contentPadding: EdgeInsets.all(16.0),
+                      title: Text(
+                        application.applicantName,
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                      ),
+                      subtitle: Row(
+                        children: [
+                          // Left side: Applicant image
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: application.aplicantImage.isNotEmpty
+                                ? Image.network(
+                              "http://localhost:8080/uploads/job-applications/" + application.aplicantImage,
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            )
+                                : Container(
+                              width: 100,
+                              height: 100,
+                              color: Colors.grey[200],
+                              child: Center(child: Text('No Image')),
+                            ),
+                          ),
+                          SizedBox(width: 16.0),
+                          // Right side: Application details and buttons
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildDetailText('Email:', application.applicantEmail),
+                                _buildDetailText('Phone:', application.applicantPhone),
+                                _buildDetailText('Resume Link:', application.resumeLink),
+                                _buildDetailText('Application Date:', application.applicationDate),
+                                _buildDetailText('Job Title Applied:', application.jobTitleApplied),
+                                _buildDetailText('Skills:', application.skills),
+                                _buildDetailText('Job Type:', application.jobTypeApplied),
+                                _buildDetailText('Location Preference:', application.locationPreference),
+                                _buildDetailText('Position Level:', application.positionLevel),
+                                SizedBox(height: 8.0),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    ElevatedButton(
+                                      onPressed: generateAndDownloadPDF,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.green,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8.0),
+                                        ),
+                                        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+                                      ),
+                                      child: Text('Download PDF'),
+                                    ),
+                                    SizedBox(width: 8.0),
+                                    ElevatedButton(
+                                      onPressed: printPDF,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.blue,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8.0),
+                                        ),
+                                        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+                                      ),
+                                      child: Text('Print PDF'),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },
@@ -219,6 +316,14 @@ class _ViewJobApplicationState extends State<ViewJobApplication> {
           ],
         ),
       ),
+    );
+  }
+
+  // Helper function to display application details
+  Widget _buildDetailText(String title, String value) {
+    return Text(
+      '$title $value',
+      style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
     );
   }
 }

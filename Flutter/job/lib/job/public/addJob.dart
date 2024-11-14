@@ -13,7 +13,7 @@ class AddJob extends StatefulWidget {
 }
 
 class AddJobState extends State<AddJob> {
-  final double minimumPadding = 5.0;
+  final double minimumPadding = 8.0;
   final TextEditingController jobTitleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController requirementsController = TextEditingController();
@@ -110,6 +110,8 @@ class AddJobState extends State<AddJob> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Add Job"),
+        backgroundColor: Colors.blueAccent,
+        elevation: 5,
       ),
       body: Form(
         key: _formKey,
@@ -120,19 +122,19 @@ class AddJobState extends State<AddJob> {
               buildTextField(
                 controller: jobTitleController,
                 label: 'Job Title',
-                hint: 'Enter your Job Title',
+                hint: 'Enter the job title',
                 textStyle: textStyle,
               ),
               buildTextField(
                 controller: descriptionController,
                 label: 'Job Description',
-                hint: 'Enter job description',
+                hint: 'Enter a brief job description',
                 textStyle: textStyle,
               ),
               buildTextField(
                 controller: requirementsController,
-                label: 'Requirements',
-                hint: 'Enter job requirements',
+                label: 'Job Requirements',
+                hint: 'Enter required skills and qualifications',
                 textStyle: textStyle,
               ),
               buildTextField(
@@ -144,14 +146,14 @@ class AddJobState extends State<AddJob> {
               buildTextField(
                 controller: salaryController,
                 label: 'Salary',
-                hint: 'Enter salary amount',
+                hint: 'Enter expected salary',
                 textStyle: textStyle,
                 keyboardType: TextInputType.number,
               ),
               buildTextField(
                 controller: jobTypeController,
                 label: 'Job Type',
-                hint: 'e.g., Full-time, Part-time',
+                hint: 'e.g., Full-time, Part-time, Contract',
                 textStyle: textStyle,
               ),
               buildTextField(
@@ -163,33 +165,57 @@ class AddJobState extends State<AddJob> {
               buildTextField(
                 controller: skillsController,
                 label: 'Skills',
-                hint: 'Comma-separated list of skills',
+                hint: 'List of skills required (comma-separated)',
                 textStyle: textStyle,
               ),
               buildTextField(
                 controller: companyNameController,
                 label: 'Company Name',
-                hint: 'Enter company name',
+                hint: 'Enter the company name',
                 textStyle: textStyle,
               ),
-              Padding(
-                padding: EdgeInsets.only(top: minimumPadding),
-                child: ElevatedButton(
-                  child: Text('Pick Image'),
-                  onPressed: _pickImage, // Add the image picker functionality
+              SizedBox(height: 20),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  padding: EdgeInsets.symmetric(vertical: 16.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
                 ),
+                child: Text(
+                  'Pick an Image',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                onPressed: _pickImage, // Add the image picker functionality
               ),
               if (_imageData != null)
                 Padding(
                   padding: EdgeInsets.only(top: minimumPadding),
-                  child: Image.memory(_imageData!, height: 150, width: 150), // Display selected image
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.memory(
+                      _imageData!,
+                      height: 150,
+                      width: 150,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
-              Padding(
-                padding: EdgeInsets.only(top: minimumPadding),
-                child: ElevatedButton(
-                  child: Text('Submit'),
-                  onPressed: _submitJob,
+              SizedBox(height: 20),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  padding: EdgeInsets.symmetric(vertical: 16.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
                 ),
+                child: Text(
+                  'Submit Job',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                onPressed: _submitJob,
               ),
             ],
           ),
@@ -220,9 +246,14 @@ class AddJobState extends State<AddJob> {
           labelText: label,
           hintText: hint,
           labelStyle: textStyle,
+          hintStyle: TextStyle(color: Colors.grey),
+          filled: true,
+          fillColor: Colors.blueGrey[50],
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(5.0),
+            borderRadius: BorderRadius.circular(10.0),
+            borderSide: BorderSide.none,
           ),
+          contentPadding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 16.0),
         ),
         keyboardType: keyboardType,
       ),

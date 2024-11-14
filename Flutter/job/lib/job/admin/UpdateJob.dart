@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class UpdateJob extends StatefulWidget {
-  final String id; // Add the 'id' parameter
+  final String id; // Job ID to fetch specific job details
 
-  UpdateJob({required this.id}); // Mark 'id' as required
+  UpdateJob({required this.id}); // Constructor to accept job ID
 
   @override
   _UpdateJobState createState() => _UpdateJobState();
@@ -22,20 +24,22 @@ class _UpdateJobState extends State<UpdateJob> {
   final TextEditingController positionController = TextEditingController();
   final TextEditingController skillsController = TextEditingController();
   final TextEditingController companyNameController = TextEditingController();
+  final TextEditingController imageUrlController = TextEditingController(); // Image URL controller
 
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  File? _selectedImage; // To store selected image locally
 
   @override
   void initState() {
     super.initState();
-    _fetchJobDetails(); // Load job details when the screen initializes
+    _fetchJobDetails(); // Fetch job details when screen loads
   }
 
   Future<void> _fetchJobDetails() async {
     setState(() => _isLoading = true);
     try {
-      final response = await http.get(Uri.parse('http://localhost:8080/getjob/${widget.id}')); // Adjust URL
+      final response = await http.get(Uri.parse('http://localhost:8080/getjob/${widget.id}')); // Adjust URL as needed
       if (response.statusCode == 200) {
         final job = json.decode(response.body);
         setState(() {
@@ -48,6 +52,7 @@ class _UpdateJobState extends State<UpdateJob> {
           positionController.text = job['position'] ?? 'Not specified';
           skillsController.text = job['skills'] ?? 'No specific skills';
           companyNameController.text = job['companyName'] ?? 'Company name unavailable';
+          imageUrlController.text = job['imageUrl'] ?? ''; // Set image URL from job
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to fetch job details')));
@@ -64,10 +69,8 @@ class _UpdateJobState extends State<UpdateJob> {
       setState(() => _isLoading = true);
       try {
         final response = await http.put(
-          Uri.parse('http://localhost:8080/updatejob/${widget.id}'), // Adjust the URL
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
+          Uri.parse('http://localhost:8080/updatejob/${widget.id}'),
+          headers: <String, String>{'Content-Type': 'application/json; charset=UTF-8'},
           body: jsonEncode({
             'jobTitle': jobTitleController.text,
             'description': descriptionController.text,
@@ -78,6 +81,7 @@ class _UpdateJobState extends State<UpdateJob> {
             'position': positionController.text,
             'skills': skillsController.text,
             'companyName': companyNameController.text,
+            'imageUrl': imageUrlController.text, // Submit image URL
           }),
         );
         if (response.statusCode == 200) {
@@ -91,6 +95,17 @@ class _UpdateJobState extends State<UpdateJob> {
       } finally {
         setState(() => _isLoading = false);
       }
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+        // Optionally update imageUrlController.text to simulate an uploaded URL
+      });
     }
   }
 
@@ -152,6 +167,23 @@ class _UpdateJobState extends State<UpdateJob> {
                 validator: (value) => value!.isEmpty ? 'Please enter company name' : null,
               ),
               SizedBox(height: minimumPadding * 2),
+
+              // Display Image URL input field
+              TextFormField(
+                controller: imageUrlController,
+                decoration: InputDecoration(labelText: 'Image URL'),
+              ),
+
+              // Display the current image or placeholder
+              _displayImage(),
+
+              // Image picker button
+              SizedBox(height: minimumPadding * 2),
+              ElevatedButton(
+                onPressed: _pickImage,
+                child: Text('Pick New Image'),
+              ),
+              SizedBox(height: minimumPadding * 2),
               ElevatedButton(
                 onPressed: _updateJob,
                 child: Text('Update Job'),
@@ -161,5 +193,16 @@ class _UpdateJobState extends State<UpdateJob> {
         ),
       ),
     );
+  }
+
+  // Method to display the current image (either network or local)
+  Widget _displayImage() {
+    if (imageUrlController.text.isNotEmpty) {
+      return Image.network(imageUrlController.text, height: 200, fit: BoxFit.cover);
+    } else if (_selectedImage != null) {
+      return Image.file(_selectedImage!, height: 200, fit: BoxFit.cover);
+    } else {
+      return Text("No image available", style: TextStyle(fontSize: 16, color: Colors.grey));
+    }
   }
 }

@@ -62,17 +62,17 @@ class ViewCompanyState extends State<ViewCompany> {
                 contentPadding: EdgeInsets.all(16),
                 leading: company['companyImage'] != null && company['companyImage'].isNotEmpty
                     ? ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(8.0),
                   child: Image.network(
-                    "http://192.168.88.243:8080/uploads/companies/${company['companyImage']}",
-                    width: 80,
-                    height: 80,
+                    company['companyImage'],
+                    width: 50,
+                    height: 50,
                     fit: BoxFit.cover,
                   ),
                 )
                     : Container(
-                  width: 80,
-                  height: 80,
+                  width: 50,
+                  height: 50,
                   color: Colors.grey[200],
                   child: Icon(Icons.business, color: Colors.grey),
                 ),
@@ -106,10 +106,50 @@ class ViewCompanyState extends State<ViewCompany> {
                 trailing: Icon(Icons.arrow_forward_ios, size: 18, color: Colors.grey),
                 onTap: () {
                   // Add your navigation or other onTap functionality here
+                  // For example, navigate to company details screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CompanyDetailsScreen(company: company),
+                    ),
+                  );
                 },
               ),
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+class CompanyDetailsScreen extends StatelessWidget {
+  final Map<String, dynamic> company;
+  CompanyDetailsScreen({required this.company});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Company Details')),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            company['companyImage'] != null && company['companyImage'].isNotEmpty
+                ? Image.network(company['companyImage'])
+                : Icon(Icons.business, size: 100, color: Colors.grey),
+            SizedBox(height: 20),
+            Text(
+              company['companyName'] ?? 'N/A',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            Text('Email: ${company['companyEmail'] ?? 'N/A'}'),
+            Text('Phone: ${company['companyPhone'] ?? 'N/A'}'),
+            Text('Employee Size: ${company['employeeSize'] ?? 'N/A'}'),
+            // Add any other details you want to show
+          ],
         ),
       ),
     );

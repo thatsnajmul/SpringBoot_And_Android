@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import 'package:job/job/admin/UpdateJob.dart';
-
 
 class AdminViewJob extends StatefulWidget {
   @override
@@ -130,48 +128,86 @@ class _ViewJobState extends State<AdminViewJob> {
               itemBuilder: (context, index) {
                 final job = _filteredJobs[index];
                 return Card(
-                  margin: EdgeInsets.all(10),
+                  margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                   elevation: 4,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Job Title: ${job.jobTitle}',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 8),
-                        Text('Company: ${job.companyName}', style: TextStyle(fontSize: 16)),
-                        Text('Location: ${job.location}', style: TextStyle(fontSize: 16)),
-                        Text('Salary: \$${job.salary?.toStringAsFixed(2)}', style: TextStyle(fontSize: 16)),
-                        Text('Job Type: ${job.jobType}', style: TextStyle(fontSize: 16)),
-                        Text('Position: ${job.position}', style: TextStyle(fontSize: 16)),
-                        SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => UpdateJob(id: job.id),
-                                  ),
-                                ).then((_) => _fetchJobs()); // Refresh jobs on return
-                              },
-                              child: Text('Edit'),
+                    padding: const EdgeInsets.all(12.0),
+                    child: ListTile(
+                      contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+                      isThreeLine: true,
+                      leading: job.image != null && job.image!.isNotEmpty
+                          ? GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FullScreenImageView(imageUrl: 'http://localhost:8080/uploads/jobs/' + job.image!),
                             ),
-                            ElevatedButton(
-                              onPressed: () => _deleteJob(job.id), // Call the delete function
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
-                              ),
-                              child: Text('Delete'),
-                            ),
-                          ],
+                          );
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0),
+                          child: Image.network(
+                            'http://localhost:8080/uploads/jobs/' + job.image!,
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      ],
+                      )
+                          : Icon(Icons.business_center, size: 60, color: Colors.grey),
+                      title: Text(
+                        job.jobTitle ?? 'Job Title Unavailable',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 4.0),
+                          Text(
+                            'Company: ${job.companyName ?? 'Company not specified'}',
+                            style: TextStyle(color: Colors.black54),
+                          ),
+                          Text(
+                            'Location: ${job.location ?? 'Location not specified'}',
+                            style: TextStyle(color: Colors.black54),
+                          ),
+                          Text(
+                            'Salary: \$${job.salary?.toStringAsFixed(2) ?? 'Not specified'}',
+                            style: TextStyle(color: Colors.black54),
+                          ),
+                        ],
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => UpdateJob(id: job.id),
+                                ),
+                              ).then((_) => _fetchJobs());
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            ),
+                            child: Text('Edit', style: TextStyle(fontSize: 14)),
+                          ),
+                          SizedBox(width: 8.0), // Space between the buttons
+                          ElevatedButton(
+                            onPressed: () => _deleteJob(job.id),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            ),
+                            child: Text('Delete', style: TextStyle(fontSize: 14)),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -184,8 +220,28 @@ class _ViewJobState extends State<AdminViewJob> {
   }
 }
 
+class FullScreenImageView extends StatelessWidget {
+  final String imageUrl;
+  const FullScreenImageView({required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Job Image')),
+      body: Center(
+        child: InteractiveViewer(
+          panEnabled: true,
+          minScale: 0.1,
+          maxScale: 1.5,
+          child: Image.network(imageUrl),
+        ),
+      ),
+    );
+  }
+}
+
 class Job {
-  final String id; // Ensure this matches the job ID field from your API
+  final String id;
   final String? jobTitle;
   final String? description;
   final String? requirements;
@@ -195,6 +251,7 @@ class Job {
   final String? position;
   final String? skills;
   final String? companyName;
+  final String? image;
 
   Job({
     required this.id,
@@ -207,11 +264,12 @@ class Job {
     this.position,
     this.skills,
     this.companyName,
+    this.image,
   });
 
   factory Job.fromJson(Map<String, dynamic> json) {
     return Job(
-      id: json['id']?.toString() ?? '', // Convert id to String if it's not already
+      id: json['id']?.toString() ?? '',
       jobTitle: json['jobTitle'] ?? 'N/A',
       description: json['description'] ?? 'No description available',
       requirements: json['requirements'] ?? 'No requirements specified',
@@ -221,6 +279,7 @@ class Job {
       position: json['position'] ?? 'Not specified',
       skills: json['skills'] ?? 'No specific skills required',
       companyName: json['companyName'] ?? 'Company name unavailable',
+      image: json['image'] ?? '',
     );
   }
 }

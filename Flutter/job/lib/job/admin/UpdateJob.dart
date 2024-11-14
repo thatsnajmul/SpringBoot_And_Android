@@ -52,7 +52,12 @@ class _UpdateJobState extends State<UpdateJob> {
           positionController.text = job['position'] ?? 'Not specified';
           skillsController.text = job['skills'] ?? 'No specific skills';
           companyNameController.text = job['companyName'] ?? 'Company name unavailable';
-          imageUrlController.text = job['imageUrl'] ?? ''; // Set image URL from job
+          Image.network(
+            "http://localhost:8080/uploads/jobs/" + job.image!,
+            width: double.infinity,
+            height: 150,
+            fit: BoxFit.contain,
+          ); // Set image URL from job
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to fetch job details')));

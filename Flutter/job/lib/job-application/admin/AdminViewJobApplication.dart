@@ -35,8 +35,8 @@ class JobApplication {
   factory JobApplication.fromJson(Map<String, dynamic> json) {
     return JobApplication(
       applicationId: json['applicationId'] is int
-          ? json['applicationId'].toString()  // If it's an int, convert it
-          : json['applicationId'] ?? '',      // Otherwise, use the value directly (if it's already a String)
+          ? json['applicationId'].toString()
+          : json['applicationId'] ?? '',
       applicantName: json['applicantName'] ?? '',
       applicantEmail: json['applicantEmail'],
       applicantPhone: json['applicantPhone'],
@@ -50,11 +50,9 @@ class JobApplication {
       positionLevel: json['positionLevel'],
     );
   }
-
 }
 
 class AdminViewJobApplications extends StatefulWidget {
-
   @override
   _AdminViewJobApplicationsState createState() => _AdminViewJobApplicationsState();
 }
@@ -126,7 +124,7 @@ class _AdminViewJobApplicationsState extends State<AdminViewJobApplications> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Job applications')),
+      appBar: AppBar(title: Text('Job Applications')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -141,49 +139,55 @@ class _AdminViewJobApplicationsState extends State<AdminViewJobApplications> {
                 ),
               ),
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 20),
             if (errorMessage.isNotEmpty)
               Text(errorMessage, style: TextStyle(color: Colors.red)),
             Expanded(
-              child: ListView.separated(
+              child: ListView.builder(
                 itemCount: filteredApplications.length,
                 itemBuilder: (context, index) {
                   final application = filteredApplications[index];
-                  return ListTile(
-                    title: Text(application.applicantName),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Email: ${application.applicantEmail ?? 'N/A'}'),
-                        Text('Phone: ${application.applicantPhone ?? 'N/A'}'),
-                        Text('Resume: ${application.resumeLink ?? 'N/A'}'),
-                        Text('Date: ${application.applicationDate}'),
-                      ],
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.edit),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => UpdateJobApplication(applicationId: application.applicationId),
+                  return Card(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    elevation: 5,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(application.applicantName, style: Theme.of(context).textTheme.titleLarge),
+                          SizedBox(height: 5),
+                          Text('Email: ${application.applicantEmail ?? 'N/A'}', style: TextStyle(color: Colors.grey[600])),
+                          Text('Phone: ${application.applicantPhone ?? 'N/A'}', style: TextStyle(color: Colors.grey[600])),
+                          Text('Resume: ${application.resumeLink ?? 'N/A'}', style: TextStyle(color: Colors.grey[600])),
+                          Text('Applied Date: ${application.applicationDate}', style: TextStyle(color: Colors.grey[600])),
+                          Divider(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.edit, color: Colors.blue),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => UpdateJobApplication(applicationId: application.applicationId),
+                                    ),
+                                  ).then((_) => fetchApplications());
+                                },
                               ),
-                            ).then((_) => fetchApplications());
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.delete),
-                          color: Colors.red,
-                          onPressed: () => deleteApplication(application.applicationId),
-                        ),
-                      ],
+                              IconButton(
+                                icon: Icon(Icons.delete, color: Colors.red),
+                                onPressed: () => deleteApplication(application.applicationId),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },
-                separatorBuilder: (context, index) => Divider(),
               ),
             ),
           ],

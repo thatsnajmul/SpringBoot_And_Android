@@ -1,47 +1,34 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-import '../Model/LoginRequest.dart';
-import '../Model/User.dart';
-
 class AuthService {
-  final String baseUrl = "http://localhost:8080/api/auth";
+  static const baseUrl = "http://localhost:8080"; // Replace with your backend URL
 
-  Future<void> register(User user) async {
+  Future<Map<String, dynamic>> registerUser(String type, Map<String, dynamic> userData) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/register'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode(user.toJson()),
-    );
-    if (response.statusCode != 200) {
-      throw Exception('Failed to register');
-    }
-  }
-
-  Future<User?> login(LoginRequest request) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode(request.toJson()),
+      Uri.parse("$baseUrl/register/$type"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(userData),
     );
 
-    if (response.statusCode == 200) {
-      // Assuming the response contains user data
-      return User.fromJson(json.decode(response.body));
+    if (response.statusCode == 201) {
+      return jsonDecode(response.body);
     } else {
-      throw Exception('Failed to login');
+      throw Exception("Failed to register user: ${response.body}");
     }
   }
 
-  Future<User?> getCurrentUser(String token) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/current'),
-      headers: {'Authorization': 'Bearer $token'},
+  Future<Map<String, dynamic>> loginUser(String email, String password) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/login"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"email": email, "password": password}),
     );
 
     if (response.statusCode == 200) {
-      return User.fromJson(json.decode(response.body));
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Failed to log in: ${response.body}");
     }
-    return null;
   }
 }

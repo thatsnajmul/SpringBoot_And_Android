@@ -47,7 +47,7 @@ public class SecurityConfig {
                                         req.requestMatchers("/login",
                                                         "/register/job-seeker", "api/users/**", "/api/access/users",
                                                         "/api/jobs","/api/jobs/search", "/api/jobs/{id}",
-                                                        "/api/jobs/get/search", "/api/jobs/get",
+                                                       //"/api/jobs/get/search", "/api/jobs/get",
                                                         "/activate/**",
                                                         "/swagger-ui.html/**",
                                                         "/images/**")

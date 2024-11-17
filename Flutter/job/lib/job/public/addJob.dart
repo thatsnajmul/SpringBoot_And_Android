@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:html' as html;
 import 'package:http_parser/http_parser.dart';
+import 'ViewJob.dart'; // Import the ViewJob page
 
 class AddJob extends StatefulWidget {
   @override
@@ -89,7 +90,14 @@ class AddJobState extends State<AddJob> {
       try {
         final response = await request.send();
         if (response.statusCode == 200 || response.statusCode == 201) {
-          Navigator.pop(context); // Navigate back if successful
+          // Navigate to the ViewJob page after successful job submission
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ViewJob(), // Replace with your desired widget
+            ),
+          );
+
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Failed to add job: ${response.statusCode}')),

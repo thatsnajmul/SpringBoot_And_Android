@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:job/LoginReg/Login.dart';
 import 'package:job/company/admin/AdminViewCompany.dart';
 import 'package:job/company/public/AddCompany.dart';
 import 'package:job/company/public/CarouselCompanyView.dart';
@@ -72,7 +73,7 @@ class JobDrawer extends StatelessWidget {
                     context,
                     'For Registration',
                     Icons.app_registration,
-                    RegisterScreen(),
+                   RegistrationPage(),
                   ),
                   _buildDrawerItem(
                     context,

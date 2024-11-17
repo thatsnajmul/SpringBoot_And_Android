@@ -3,9 +3,10 @@ import 'package:job/Profile.dart';
 import 'package:job/company/public/ViewCompany.dart';
 import 'package:job/job/public/ViewJob.dart';
 import 'package:job/job/public/addJob.dart';
+import 'LoginReg/Login.dart';
 import 'job/public/jobDrawer.dart'; // Import the JobDrawer widget
 import 'LoginReg/RegisterScreen.dart'; // Import the RegisterScreen widget
-import 'LoginReg/Login.dart'; // Import the LoginScreen widget
+
 
 void main() {
   runApp(MyApp());
@@ -59,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => RegisterScreen()),
+                MaterialPageRoute(builder: (context) => RegistrationPage()),
               );
             },
           ),
@@ -68,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Login()),
+                MaterialPageRoute(builder: (context) => LoginScreen()),
               );
             },
           ),
@@ -77,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => RegisterScreen()),
+                MaterialPageRoute(builder: (context) => RegistrationPage()),
               );
             },
           ),

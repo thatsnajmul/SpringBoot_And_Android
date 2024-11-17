@@ -4,7 +4,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:html' as html;
 import 'package:http_parser/http_parser.dart';
-import 'ViewJob.dart'; // Import the ViewJob page
+import 'package:job/main.dart';
+
 
 class AddJob extends StatefulWidget {
   @override
@@ -94,7 +95,7 @@ class AddJobState extends State<AddJob> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => ViewJob(), // Replace with your desired widget
+              builder: (context) => MyApp(), // Replace with your desired widget
             ),
           );
 

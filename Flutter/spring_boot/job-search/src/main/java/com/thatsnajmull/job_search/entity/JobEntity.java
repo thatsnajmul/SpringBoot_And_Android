@@ -1,9 +1,7 @@
 package com.thatsnajmull.job_search.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
 
 @Entity
 public class JobEntity {
@@ -24,6 +22,11 @@ public class JobEntity {
 
     // Added image field to store image file name
     private String image;
+
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    @JsonBackReference // This is the child
+    private User user;
 
     public JobEntity() {}
 

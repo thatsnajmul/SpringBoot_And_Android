@@ -2,12 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'RegisterScreen.dart'; // Ensure this file exists and is properly imported
-import 'User.dart';
-import 'dashboard.dart'; // Ensure this file exists and is properly imported
+import 'dashboard.dart'; // Ensure correct import path
 
 class Login extends StatefulWidget {
-  Login({Key? key}) : super(key: key);
+  const Login({Key? key}) : super(key: key);
 
   @override
   _LoginState createState() => _LoginState();
@@ -15,54 +13,52 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
-  User user = User("", "");
+  String email = "";
+  String password = "";
   String url = "http://localhost:8080/login";
-
-  get key => null;
 
   Future<void> save() async {
     try {
       var res = await http.post(
-        Uri.parse(url), // Ensure URL parsing
+        Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({'email': user.email, 'password': user.password}),
+        body: json.encode({'email': email, 'password': password}),
       );
-      print(res.body);
 
-      if (res.statusCode == 200) { // Handle success based on HTTP status
-        Navigator.pushReplacement(
+      if (res.statusCode == 200) {
+        final responseData = json.decode(res.body);
+        final int userId = responseData['id']; // Ensure backend returns `id`
+        Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => Dashboard(key: key), // Ensure `Dashboard` exists
+            builder: (context) => Dashboard(key: Key(userId as String),), // Pass userId here
           ),
         );
       } else {
-        // Display error message if login fails
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text("Login Failed"),
-            content: Text("Invalid email or password."),
+            title: const Text("Login Failed"),
+            content: const Text("Invalid email or password."),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text("OK"),
+                child: const Text("OK"),
               ),
             ],
           ),
         );
       }
     } catch (e) {
-      print("Error: $e");
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text("Error"),
-          content: Text("An error occurred. Please try again."),
+          title: const Text("Error"),
+          content: Text("An error occurred: $e"),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text("OK"),
+              child: const Text("OK"),
             ),
           ],
         ),
@@ -81,7 +77,7 @@ class _LoginState extends State<Login> {
               Container(
                 height: 750,
                 width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Color.fromRGBO(233, 65, 82, 1),
                   boxShadow: [
                     BoxShadow(
@@ -98,7 +94,7 @@ class _LoginState extends State<Login> {
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      SizedBox(height: 100),
+                      const SizedBox(height: 100),
                       Text(
                         "Login",
                         style: GoogleFonts.pacifico(
@@ -107,77 +103,70 @@ class _LoginState extends State<Login> {
                           color: Colors.white,
                         ),
                       ),
-                      SizedBox(height: 30),
+                      const SizedBox(height: 30),
                       Align(
                         alignment: Alignment.topLeft,
                         child: Text(
                           "Email",
                           style: GoogleFonts.roboto(
                             fontSize: 40,
-                            color: Color.fromRGBO(255, 255, 255, 0.8),
+                            color: const Color.fromRGBO(255, 255, 255, 0.8),
                           ),
                         ),
                       ),
                       TextFormField(
-                        initialValue: user.email,
-                        onChanged: (val) => user.email = val,
+                        onChanged: (val) => email = val,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Email is empty';
                           }
                           return null;
                         },
-                        style: TextStyle(fontSize: 30, color: Colors.white),
-                        decoration: InputDecoration(
+                        style: const TextStyle(fontSize: 30, color: Colors.white),
+                        decoration: const InputDecoration(
                           errorStyle: TextStyle(fontSize: 20, color: Colors.black),
                           border: OutlineInputBorder(borderSide: BorderSide.none),
                         ),
                       ),
                       Container(
                         height: 8,
-                        color: Color.fromRGBO(255, 255, 255, 0.4),
+                        color: const Color.fromRGBO(255, 255, 255, 0.4),
                       ),
-                      SizedBox(height: 60),
+                      const SizedBox(height: 60),
                       Align(
                         alignment: Alignment.topLeft,
                         child: Text(
                           "Password",
                           style: GoogleFonts.roboto(
                             fontSize: 40,
-                            color: Color.fromRGBO(255, 255, 255, 0.8),
+                            color: const Color.fromRGBO(255, 255, 255, 0.8),
                           ),
                         ),
                       ),
                       TextFormField(
                         obscureText: true,
-                        initialValue: user.password,
-                        onChanged: (val) => user.password = val,
+                        onChanged: (val) => password = val,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Password is empty';
                           }
                           return null;
                         },
-                        style: TextStyle(fontSize: 30, color: Colors.white),
-                        decoration: InputDecoration(
+                        style: const TextStyle(fontSize: 30, color: Colors.white),
+                        decoration: const InputDecoration(
                           errorStyle: TextStyle(fontSize: 20, color: Colors.black),
                           border: OutlineInputBorder(borderSide: BorderSide.none),
                         ),
                       ),
                       Container(
                         height: 8,
-                        color: Color.fromRGBO(255, 255, 255, 0.4),
+                        color: const Color.fromRGBO(255, 255, 255, 0.4),
                       ),
-                      SizedBox(height: 60),
+                      const SizedBox(height: 60),
                       Center(
                         child: InkWell(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Register(), // Ensure `Register` exists
-                              ),
-                            );
+                            Navigator.pushNamed(context, '/register'); // Example: Register screen
                           },
                           child: Text(
                             "Don't have an account?",
@@ -193,20 +182,21 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-              SizedBox(height: 40),
-              Container(
+              const SizedBox(height: 40),
+              SizedBox(
                 height: 90,
                 width: 90,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    shape: CircleBorder(), backgroundColor: Color.fromRGBO(233, 65, 82, 1),
+                    shape: const CircleBorder(),
+                    backgroundColor: const Color.fromRGBO(233, 65, 82, 1),
                   ),
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       save();
                     }
                   },
-                  child: Icon(
+                  child: const Icon(
                     Icons.arrow_forward,
                     color: Colors.white,
                     size: 30,

@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
+import 'Login.dart'; // Ensure the Login screen file is imported
 import 'User.dart';
 
 class Register extends StatefulWidget {
-  Register();
+  const Register({Key? key}) : super(key: key);
 
   @override
   _RegisterState createState() => _RegisterState();
@@ -17,15 +18,50 @@ class _RegisterState extends State<Register> {
   User user = User("", "");
   String url = "http://localhost:8080/register";
 
-  Future save() async {
-    var res = await http.post(
-      Uri.parse(url),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({'email': user.email, 'password': user.password}),
-    );
-    print(res.body);
-    if (res.body != null) {
-      Navigator.pop(context);
+  Future<void> save() async {
+    try {
+      var res = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'email': user.email, 'password': user.password}),
+      );
+
+      if (res.statusCode == 200) {
+        print("User registered successfully");
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const Login()), // Navigate to Login
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text("Registration Failed"),
+            content: Text("Failed to register. Please try again."),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      print("Error: $e");
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Error"),
+          content: Text("An error occurred: $e"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("OK"),
+            ),
+          ],
+        ),
+      );
     }
   }
 
@@ -41,15 +77,15 @@ class _RegisterState extends State<Register> {
                 height: 750,
                 width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
-                  color: Color.fromRGBO(233, 65, 82, 1),
+                  color: const Color.fromRGBO(233, 65, 82, 1),
                   boxShadow: [
                     BoxShadow(
                       blurRadius: 10,
                       color: Colors.black,
-                      offset: Offset(1, 5),
+                      offset: const Offset(1, 5),
                     ),
                   ],
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(80),
                     bottomRight: Radius.circular(20),
                   ),
@@ -58,7 +94,7 @@ class _RegisterState extends State<Register> {
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      SizedBox(height: 100),
+                      const SizedBox(height: 100),
                       Text(
                         "Register",
                         style: GoogleFonts.pacifico(
@@ -67,14 +103,14 @@ class _RegisterState extends State<Register> {
                           color: Colors.white,
                         ),
                       ),
-                      SizedBox(height: 30),
+                      const SizedBox(height: 30),
                       Align(
                         alignment: Alignment.topLeft,
                         child: Text(
                           "Email",
                           style: GoogleFonts.roboto(
                             fontSize: 40,
-                            color: Color.fromRGBO(255, 255, 255, 0.8),
+                            color: const Color.fromRGBO(255, 255, 255, 0.8),
                           ),
                         ),
                       ),
@@ -85,12 +121,12 @@ class _RegisterState extends State<Register> {
                         },
                         validator: (value) {
                           if (value!.isEmpty) {
-                            return 'Email is Empty';
+                            return 'Email is empty';
                           }
                           return null;
                         },
-                        style: TextStyle(fontSize: 30, color: Colors.white),
-                        decoration: InputDecoration(
+                        style: const TextStyle(fontSize: 30, color: Colors.white),
+                        decoration: const InputDecoration(
                           errorStyle: TextStyle(
                             fontSize: 20,
                             color: Colors.black,
@@ -102,16 +138,16 @@ class _RegisterState extends State<Register> {
                       ),
                       Container(
                         height: 8,
-                        color: Color.fromRGBO(255, 255, 255, 0.4),
+                        color: const Color.fromRGBO(255, 255, 255, 0.4),
                       ),
-                      SizedBox(height: 60),
+                      const SizedBox(height: 60),
                       Align(
                         alignment: Alignment.topLeft,
                         child: Text(
                           "Password",
                           style: GoogleFonts.roboto(
                             fontSize: 40,
-                            color: Color.fromRGBO(255, 255, 255, 0.8),
+                            color: const Color.fromRGBO(255, 255, 255, 0.8),
                           ),
                         ),
                       ),
@@ -123,12 +159,12 @@ class _RegisterState extends State<Register> {
                         },
                         validator: (value) {
                           if (value!.isEmpty) {
-                            return 'Password is Empty';
+                            return 'Password is empty';
                           }
                           return null;
                         },
-                        style: TextStyle(fontSize: 30, color: Colors.white),
-                        decoration: InputDecoration(
+                        style: const TextStyle(fontSize: 30, color: Colors.white),
+                        decoration: const InputDecoration(
                           errorStyle: TextStyle(
                             fontSize: 20,
                             color: Colors.black,
@@ -140,16 +176,19 @@ class _RegisterState extends State<Register> {
                       ),
                       Container(
                         height: 8,
-                        color: Color.fromRGBO(255, 255, 255, 0.4),
+                        color: const Color.fromRGBO(255, 255, 255, 0.4),
                       ),
-                      SizedBox(height: 60),
+                      const SizedBox(height: 60),
                       Center(
                         child: InkWell(
                           onTap: () {
-                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const Login()),
+                            );
                           },
                           child: Text(
-                            "Already have Account?",
+                            "Already have an Account?",
                             style: GoogleFonts.roboto(
                               fontWeight: FontWeight.bold,
                               fontSize: 20,
@@ -162,13 +201,13 @@ class _RegisterState extends State<Register> {
                   ),
                 ),
               ),
-              SizedBox(height: 40),
+              const SizedBox(height: 40),
               Container(
                 height: 90,
                 width: 90,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromRGBO(233, 65, 82, 1),
+                    backgroundColor: const Color.fromRGBO(233, 65, 82, 1),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(50),
                     ),
@@ -178,7 +217,7 @@ class _RegisterState extends State<Register> {
                       save();
                     }
                   },
-                  child: Icon(
+                  child: const Icon(
                     Icons.arrow_forward,
                     color: Colors.white,
                     size: 30,

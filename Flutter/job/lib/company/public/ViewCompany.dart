@@ -283,21 +283,8 @@ class _ViewCompanyState extends State<ViewCompany> {
                             'Details: ${company.companyDetails}',
                             style: TextStyle(color: Colors.grey[700]),
                           ),
-                          SizedBox(height: 12.0),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              ElevatedButton.icon(
-                                onPressed: printPDF,
-                                icon: Icon(Icons.print),
-                                label: Text('Print'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blueAccent,
-                                  padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                                ),
-                              ),
-                            ],
-                          ),
+
+
                         ],
                       ),
                     ),

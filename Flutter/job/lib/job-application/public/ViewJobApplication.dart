@@ -277,17 +277,6 @@ class _ViewJobApplicationState extends State<ViewJobApplication> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    ElevatedButton(
-                                      onPressed: generateAndDownloadPDF,
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.green,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8.0),
-                                        ),
-                                        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-                                      ),
-                                      child: Text('Download PDF'),
-                                    ),
                                     SizedBox(width: 8.0),
                                     ElevatedButton(
                                       onPressed: printPDF,

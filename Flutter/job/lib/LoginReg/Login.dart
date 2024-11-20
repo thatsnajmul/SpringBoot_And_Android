@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:job/job/public/jobDrawer.dart';
+import 'package:job/main.dart';
 import 'dashboard.dart'; // Ensure correct import path
 
 class Login extends StatefulWidget {
@@ -31,7 +33,7 @@ class _LoginState extends State<Login> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => Dashboard(key: Key(userId as String),), // Pass userId here
+            builder: (context) => HomeScreen(), // Pass userId here
           ),
         );
       } else {

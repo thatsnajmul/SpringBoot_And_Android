@@ -1,165 +1,194 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 
-import '../Service/AuthService.dart';
+import 'User.dart';
 
+class Register extends StatefulWidget {
+  Register();
 
-class RegistrationPage extends StatefulWidget {
   @override
-  _RegistrationPageState createState() => _RegistrationPageState();
+  _RegisterState createState() => _RegisterState();
 }
 
-class _RegistrationPageState extends State<RegistrationPage> {
+class _RegisterState extends State<Register> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
-  final TextEditingController cellController = TextEditingController();
-  final TextEditingController addressController = TextEditingController();
-  String selectedRole = 'job-seeker';
-  bool isLoading = false;
+  User user = User("", "");
+  String url = "http://localhost:8080/register";
 
-  final AuthService authService = AuthService();
+  Future save() async {
+    var res = await http.post(
+      Uri.parse(url),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'email': user.email, 'password': user.password}),
+    );
+    print(res.body);
+    if (res.body != null) {
+      Navigator.pop(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Register"),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: SingleChildScrollView(
         child: Form(
           key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextFormField(
-                  controller: nameController,
-                  decoration: const InputDecoration(labelText: "Name"),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Please enter your name";
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: emailController,
-                  decoration: const InputDecoration(labelText: "Email"),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Please enter your email";
-                    }
-                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                      return "Enter a valid email address";
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: passwordController,
-                  decoration: const InputDecoration(labelText: "Password"),
-                  obscureText: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Please enter a password";
-                    }
-                    if (value.length < 6) {
-                      return "Password must be at least 6 characters long";
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: confirmPasswordController,
-                  decoration: const InputDecoration(labelText: "Confirm Password"),
-                  obscureText: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Please confirm your password";
-                    }
-                    if (value != passwordController.text) {
-                      return "Passwords do not match";
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: cellController,
-                  decoration: const InputDecoration(labelText: "Phone Number"),
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: addressController,
-                  decoration: const InputDecoration(labelText: "Address"),
-                ),
-                const SizedBox(height: 20),
-                const Text("Select Role"),
-                DropdownButtonFormField<String>(
-                  value: selectedRole,
-                  items: const [
-                    DropdownMenuItem(value: 'job-seeker', child: Text("Job Seeker")),
-                    DropdownMenuItem(value: 'admin', child: Text("Admin")),
-                    DropdownMenuItem(value: 'employer', child: Text("Employer")),
+          child: Column(
+            children: [
+              Container(
+                height: 750,
+                width: MediaQuery.of(context).size.width,
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(233, 65, 82, 1),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 10,
+                      color: Colors.black,
+                      offset: Offset(1, 5),
+                    ),
                   ],
-                  onChanged: (value) {
-                    setState(() {
-                      selectedRole = value!;
-                    });
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(80),
+                    bottomRight: Radius.circular(20),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      SizedBox(height: 100),
+                      Text(
+                        "Register",
+                        style: GoogleFonts.pacifico(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 50,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 30),
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Email",
+                          style: GoogleFonts.roboto(
+                            fontSize: 40,
+                            color: Color.fromRGBO(255, 255, 255, 0.8),
+                          ),
+                        ),
+                      ),
+                      TextFormField(
+                        controller: TextEditingController(text: user.email),
+                        onChanged: (val) {
+                          user.email = val;
+                        },
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Email is Empty';
+                          }
+                          return null;
+                        },
+                        style: TextStyle(fontSize: 30, color: Colors.white),
+                        decoration: InputDecoration(
+                          errorStyle: TextStyle(
+                            fontSize: 20,
+                            color: Colors.black,
+                          ),
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        height: 8,
+                        color: Color.fromRGBO(255, 255, 255, 0.4),
+                      ),
+                      SizedBox(height: 60),
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Password",
+                          style: GoogleFonts.roboto(
+                            fontSize: 40,
+                            color: Color.fromRGBO(255, 255, 255, 0.8),
+                          ),
+                        ),
+                      ),
+                      TextFormField(
+                        obscureText: true,
+                        controller: TextEditingController(text: user.password),
+                        onChanged: (val) {
+                          user.password = val;
+                        },
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Password is Empty';
+                          }
+                          return null;
+                        },
+                        style: TextStyle(fontSize: 30, color: Colors.white),
+                        decoration: InputDecoration(
+                          errorStyle: TextStyle(
+                            fontSize: 20,
+                            color: Colors.black,
+                          ),
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        height: 8,
+                        color: Color.fromRGBO(255, 255, 255, 0.4),
+                      ),
+                      SizedBox(height: 60),
+                      Center(
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            "Already have Account?",
+                            style: GoogleFonts.roboto(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 40),
+              Container(
+                height: 90,
+                width: 90,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromRGBO(233, 65, 82, 1),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                  ),
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      save();
+                    }
                   },
-                  decoration: const InputDecoration(labelText: "Role"),
+                  child: Icon(
+                    Icons.arrow_forward,
+                    color: Colors.white,
+                    size: 30,
+                  ),
                 ),
-                const SizedBox(height: 20),
-                isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : ElevatedButton(
-                  onPressed: _register,
-                  child: const Text("Register"),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
     );
-  }
-
-  Future<void> _register() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        isLoading = true;
-      });
-
-      try {
-        final response = await authService.registerUser(selectedRole, {
-          "name": nameController.text,
-          "email": emailController.text,
-          "password": passwordController.text,
-          "cell": cellController.text,
-          "address": addressController.text,
-          "active": true,
-          "role": selectedRole.toUpperCase(),
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Registration successful: ${response['message']}")),
-        );
-        Navigator.pop(context); // Go back to login or previous screen
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Registration failed: $e")),
-        );
-      } finally {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    }
   }
 }

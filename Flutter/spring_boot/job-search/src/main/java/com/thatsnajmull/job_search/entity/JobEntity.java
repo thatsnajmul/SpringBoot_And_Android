@@ -23,10 +23,10 @@ public class JobEntity {
     // Added image field to store image file name
     private String image;
 
-    @ManyToOne
-    @JoinColumn(name = "userId")
-    @JsonBackReference // This is the child
-    private User user;
+//    @ManyToOne
+//    @JoinColumn(name = "userId")
+//    @JsonBackReference // This is the child
+//    private User user;
 
     public JobEntity() {}
 

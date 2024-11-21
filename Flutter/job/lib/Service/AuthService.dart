@@ -3,6 +3,8 @@ import 'package:jwt_decode/jwt_decode.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+import '../LoginReg/User.dart';
+
 class AuthService {
 
   final String baseUrl = 'http://localhost:8080';
@@ -47,9 +49,11 @@ class AuthService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       String token = data['token'];
+      Map<String, dynamic> currentUserMap = data['user'];
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('authToken', token);
+      await prefs.setString('user', jsonEncode(currentUserMap));
 
       return true;
     } else {
@@ -88,6 +92,17 @@ class AuthService {
     }
   }
 
+  Future<User?> getStoredUser() async {
+    final sp = await SharedPreferences.getInstance();
+    final userJson = sp.getString("user");
+    if (userJson != null) {
+      User user = User.fromJson(jsonDecode(userJson));
+      return user;
+    } else {
+      return null;
+    }
+  }
+
   Future<void> logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('authToken');
@@ -108,7 +123,7 @@ class AuthService {
   }
 
   Future<bool> isJobSeeker() async {
-    return await hasRole(['JOBSEEKER']);
+    return await hasRole(['JOB_SEEKER']);
   }
 
 

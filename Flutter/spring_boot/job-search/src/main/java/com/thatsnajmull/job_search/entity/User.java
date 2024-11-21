@@ -1,5 +1,6 @@
 package com.thatsnajmull.job_search.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -49,17 +50,13 @@ public class User implements UserDetails {
 
 
 
-
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
 
     @OneToMany(mappedBy = "user")
     @JsonManagedReference // This is the parent
     private List<JobEntity> jobs;
-
-    @OneToMany(mappedBy = "roles")
-    @JsonManagedReference // This is the parent
-    private List<JobEntity> roles;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

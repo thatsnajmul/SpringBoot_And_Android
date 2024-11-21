@@ -73,13 +73,13 @@ class JobDrawer extends StatelessWidget {
                     context,
                     'For Registration',
                     Icons.app_registration,
-                   Register(),
+                   RegistrationPage(),
                   ),
                   _buildDrawerItem(
                     context,
                     'For Login',
                     Icons.login,
-                    Login(),
+                    LoginPage(),
                   ),
                   _buildDrawerItem(
                     context,

@@ -10,11 +10,11 @@ class AuthService {
   final String baseUrl = 'http://localhost:8080';
 
 
-  Future<bool> login(String email, String password) async {
+  Future<bool> login(String name, String email, String password) async {
     final url = Uri.parse('$baseUrl/login');
     final headers = {'Content-Type': 'application/json'};
 
-    final body = jsonEncode({'email': email, 'password': password});
+    final body = jsonEncode({'name': name, 'email': email, 'password': password});
 
     final response = await http.post(url, headers: headers, body: body);
 

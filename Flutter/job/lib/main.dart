@@ -37,10 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _widgetOptions = <Widget>[
     ViewJob(), // View Jobs
     ViewCompany(), // Add Job
-    ProfilePage(
-        name: 'name',
-        email: 'email',
-        profileImageUrl: 'https://nmhislam.wordpress.com/wp-content/uploads/2016/12/15129046_1776258662641056_826858525416318744_o.jpg')
+    ProfilePage()
+
   ];
 
   void _onItemTapped(int index) {
@@ -60,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => RegistrationPage()),
+                MaterialPageRoute(builder: (context) => ProfilePage()),
               );
             },
           ),

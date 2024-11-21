@@ -46,8 +46,8 @@ public class SecurityConfig {
                         .authorizeHttpRequests(
 
                                 req ->
-                                        req.requestMatchers("/login",
-                                                        "/register/job-seeker", "api/users/**", "/api/access/users",
+                                        req.requestMatchers("/login","/**",
+                                                        "/register/job-seeker/**", "api/users/**", "/api/access/users",
                                                         "/api/jobs","/api/jobs/search", "/api/jobs/{id}",
                                                        //"/api/jobs/get/search", "/api/jobs/get",
                                                         "/activate/**",
@@ -62,7 +62,7 @@ public class SecurityConfig {
                                                         "/api/personal-details", "/api/personal-details/search", "/api/personal-details/{id}")
                                                 .hasAuthority("ADMIN")
 
-                                                .requestMatchers("/api/jobs", "/api/jobs/{id}","/api/job-applications", "/api/job-applications/{id}")
+                                                .requestMatchers("/getalljobs/**", "/api/jobs/{id}","/api/job-applications", "/api/job-applications/{id}")
                                                 .hasAuthority( "EMPLOYER")
 
                                                 .requestMatchers("/api/personal-details")

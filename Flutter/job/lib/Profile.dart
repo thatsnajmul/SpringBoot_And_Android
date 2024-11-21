@@ -1,73 +1,90 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:job/main.dart';
 
-class ProfilePage extends StatelessWidget {
-  final String name;
-  final String email;
-  final String profileImageUrl;
+import 'LoginReg/Login.dart'; // Replace with the actual path to your LoginPage class
 
-  ProfilePage({
-    required this.name,
-    required this.email,
-    required this.profileImageUrl,
-  });
+class ProfilePage extends StatefulWidget {
+  @override
+  _ProfilePageState createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  final storage = FlutterSecureStorage();
+  String? userName;
+  String? userEmail;
+  String? userRole;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserData();
+  }
+
+  Future<void> fetchUserData() async {
+    try {
+      final name = await storage.read(key: 'user_name');
+      final email = await storage.read(key: 'user_email');
+      final role = await storage.read(key: 'user_role');
+
+      // Debugging prints
+      print('Fetched Data -> Name: $name, Email: $email, Role: $role');
+
+      setState(() {
+        userName = name ?? 'Name not available';
+        userEmail = email ?? 'Email not available';
+        userRole = role ?? 'Role not available';
+      });
+    } catch (e) {
+      print('Error fetching user data: $e');
+    }
+  }
+
+  Future<void> logout(BuildContext context) async {
+    // Clear all stored data
+    await storage.deleteAll();
+
+    // Navigate to LoginPage after clearing the data
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => HomeScreen()),
+          (route) => false, // Remove all previous routes
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profile'),
+        title: Text('User Profile'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(
-              radius: 60,
-              backgroundColor: Colors.grey[200],
-              child: ClipOval(
-                child: CachedNetworkImage(
-                  imageUrl: profileImageUrl,
-                  placeholder: (context, url) => CircularProgressIndicator(),
-                  errorWidget: (context, url, error) => Icon(
-                    Icons.error,
-                    color: Colors.red,
-                    size: 40,
-                  ),
-                  fit: BoxFit.cover,
-                ),
+            if (userName != null) ...[
+              Text('Name: $userName', style: TextStyle(fontSize: 18)),
+              SizedBox(height: 10),
+              Text('Email: $userEmail', style: TextStyle(fontSize: 18)),
+              SizedBox(height: 10),
+              Text('Role: $userRole', style: TextStyle(fontSize: 18)),
+            ] else
+              Center(child: CircularProgressIndicator()),
+
+            Spacer(), // Push the button to the bottom
+
+            // Logout Button
+            ElevatedButton(
+              onPressed: () => logout(context),
+              child: Text(
+                'Logout',
+                style: TextStyle(fontSize: 16),
               ),
-            ),
-            SizedBox(height: 16),
-            Text(
-              name,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.redAccent,
               ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              email,
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey[600],
-              ),
-            ),
-            SizedBox(height: 32),
-            ListTile(
-              leading: Icon(Icons.edit),
-              title: Text('Edit Profile'),
-              onTap: () {
-                // Handle edit profile action
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Logout'),
-              onTap: () {
-                // Handle logout action
-              },
             ),
           ],
         ),

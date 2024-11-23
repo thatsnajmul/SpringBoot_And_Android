@@ -64,7 +64,7 @@ public class AuthService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(Role.valueOf("JOB_SEEKER"));
-        user.setLock(true);
+        user.setLock(false);
         user.setActive(false);
 
         userRepository.save(user);
@@ -91,7 +91,7 @@ public class AuthService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(Role.valueOf("ADMIN"));
-        user.setLock(true);
+        user.setLock(false);
         user.setActive(false);
 
         userRepository.save(user);
@@ -243,11 +243,11 @@ public class AuthService {
     private void sendActivationEmail(User user) {
         String activationLink = "http://localhost:8080/activate/" + user.getId();
 
-        String mailText = "<h3>Dear " + user.getName()
-                + ",</h3>"
-                + "<p>Please click on the following link to confirm your account:</p>"
-                + "<a href=\"" + activationLink + "\">Activate Account</a>"
-                + "<br><br>Regards,<br>Job Portal";
+        String mailText = "Dear " + user.getName()
+                + ","+ "\n"+
+                 "Please click on the following link to confirm your account: "
+                + activationLink + " Activate Account" +"\n"+
+                 "Regards, Job Portal";
 
         String subject = "Confirm User Account";
 

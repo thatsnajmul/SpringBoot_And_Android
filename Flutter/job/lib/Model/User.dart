@@ -1,13 +1,14 @@
 class User {
-  final String username;
+  final String name;
   late final String email; // This parameter is required
 
-  User({required this.username, required this.email, required String password}); // Constructor requires both
+  User({required this.name, required this.email, required String password}); // Constructor requires both
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      username: json['username'],
-      email: json['email'], password: '',
+      name: json['name'],
+      email: json['email'],
+      password: '',
     );
   }
 
@@ -15,7 +16,7 @@ class User {
 
   Map<String, dynamic> toJson() {
     return {
-      'username': username,
+      'name': name,
       'email': email,
     };
   }

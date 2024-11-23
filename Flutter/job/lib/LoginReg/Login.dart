@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:job/AdminPage.dart';
-import 'package:job/EmployerPage.dart';
-import 'package:job/LoginReg/RegisterScreen.dart';
-import 'package:job/main.dart';
-
+import '../AdminPage.dart';
+import '../EmployerPage.dart';
 import '../Service/AuthService.dart';
-
+import '../job/public/jobDrawer.dart';
+import '../LoginReg/RegisterScreen.dart';
 
 class LoginPage extends StatelessWidget {
-  final TextEditingController name = TextEditingController();
   final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
   final storage = FlutterSecureStorage();
@@ -18,71 +15,65 @@ class LoginPage extends StatelessWidget {
 
   Future<void> loginUser(BuildContext context) async {
     try {
-      final response = await authService.login(name.text, email.text, password.text);
+      // Attempt login
+      final isLoggedIn = await authService.login('', email.text, password.text);
 
-      // Mock response - replace with actual API response
-      final String? role = await authService.getUserRole(); // Example: "JOB_SEEKER"
-      final String userName = name.text; // Replace with API-provided name or username
-      final String userEmail = email.text; // Replace with API-provided email
+      if (isLoggedIn) {
+        // Retrieve role from shared preferences
+        final String? role = await authService.getUserRole();
 
-      // Save user details securely
-      await storage.write(key: 'user_role', value: role);
-      await storage.write(key: 'user_name', value: userName);
-      await storage.write(key: 'user_email', value: userEmail);
+        // Save user details in secure storage
+        await storage.write(key: 'user_role', value: role);
+        await storage.write(key: 'user_email', value: email.text);
 
-      // Navigate based on role
-      if (role == 'ADMIN') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => AdminPage()),
-        );
-      } else if (role == 'EMPLOYER') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => EmployerPage()),
-        );
-      } else if (role == 'JOB_SEEKER') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
+        // Navigate to appropriate screen based on role
+        if (role == 'ADMIN') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => Adminpage()),
+          );
+        } else if (role == 'EMPLOYER') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => EmployerPage()),
+          );
+        } else if (role == 'JOB_SEEKER') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => JobDrawer()),
+          );
+        } else {
+          throw Exception('Unknown role');
+        }
       } else {
-        print('Unknown role: $role');
+        _showErrorDialog(context, 'Login failed. Please check your credentials.');
       }
     } catch (error) {
-      print('Login failed: $error');
+      _showErrorDialog(context, 'An error occurred during login: $error');
     }
+  }
+
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: FutureBuilder<String?>(
-          future: storage.read(key: 'user_name'),  // Retrieve the user name from storage
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Text('Loading...');
-            } else if (snapshot.hasData && snapshot.data != null) {
-              return Text(
-                'Welcome, ${snapshot.data}',
-                style: GoogleFonts.lato(),
-              );
-            } else {
-              return Text(
-                'Login',
-                style: GoogleFonts.lato(),
-              );
-            }
-          },
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context); // Navigate back
-          },
-        ),
-      ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
@@ -102,15 +93,13 @@ class LoginPage extends StatelessWidget {
               decoration: InputDecoration(
                 labelText: 'Password',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.lock),
+                prefixIcon: Icon(Icons.password),
               ),
               obscureText: true,
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                loginUser(context);
-              },
+              onPressed: () => loginUser(context),
               child: Text(
                 "Login",
                 style: TextStyle(
@@ -147,7 +136,7 @@ class LoginPage extends StatelessWidget {
 }
 
 
-
+//
 // import 'package:flutter/material.dart';
 // import 'package:google_fonts/google_fonts.dart';
 // import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -171,7 +160,7 @@ class LoginPage extends StatelessWidget {
 //
 //   Future<void> loginUser(BuildContext context) async {
 //     try {
-//       final response = await authService.login(email.text, password.text);
+//       final response = await authService.login(name.text, email.text, password.text);
 //
 //       // Mock response - replace with actual API response
 //       final String? role = await authService.getUserRole(); // Example: "JOB_SEEKER"
@@ -187,20 +176,18 @@ class LoginPage extends StatelessWidget {
 //       if (role == 'ADMIN') {
 //         Navigator.pushReplacement(
 //           context,
-//           MaterialPageRoute(builder: (context) => AdminPage()),
+//           MaterialPageRoute(builder: (context) => HomeScreen()),
 //         );
-//       } else if (role == 'EMPLOYER') {
-//         Navigator.pushReplacement(
-//           context,
-//           MaterialPageRoute(builder: (context) => EmployerPage()),
-//         );
-//       } else if (role == 'JOB_SEEKER') {
+//       } if (role == 'EMPLOYER') {
 //         Navigator.pushReplacement(
 //           context,
 //           MaterialPageRoute(builder: (context) => HomeScreen()),
 //         );
-//       } else {
-//         print('Unknown role: $role');
+//       } if (role == 'JOB_SEEKER') {
+//         Navigator.pushReplacement(
+//           context,
+//           MaterialPageRoute(builder: (context) => HomeScreen()),
+//         );
 //       }
 //     } catch (error) {
 //       print('Login failed: $error');
@@ -282,3 +269,4 @@ class LoginPage extends StatelessWidget {
 //     );
 //   }
 // }
+//

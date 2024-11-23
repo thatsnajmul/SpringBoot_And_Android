@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://localhost:9097")
 @RestController
 @RequestMapping("/api/users")
-@PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYER')")
+//@PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYER')")
 public class UserController {
 
     @Autowired

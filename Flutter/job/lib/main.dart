@@ -136,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'View Jobs',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.add),
+            icon: Icon(Icons.business),
             label: 'View Companies',
           ),
           BottomNavigationBarItem(

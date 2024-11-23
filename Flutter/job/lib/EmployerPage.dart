@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:job/company/admin/AdminViewCompany.dart';
+import 'package:job/company/admin/CompanyViewByCurrentUser.dart';
+import 'package:job/job-application/public/ViewJobApplication.dart';
+import 'package:job/job/public/addJob.dart';
 
 class EmployerPage extends StatefulWidget {
   @override
@@ -28,24 +32,30 @@ class _EmployerPageState extends State<EmployerPage> {
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                // Navigate to the Job Posting Page
-                print('Post Job Clicked');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AddJob()),
+                );
               },
-              child: Text('Post a Job'),
+              child: Text('Add Job'),
             ),
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                // Navigate to the Job Applications Page
-                print('View Applications Clicked');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ViewJobApplication()),
+                );
               },
-              child: Text('View Applications'),
+              child: Text('View Job Application'),
             ),
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                // Navigate to the Company Profile Management Page
-                print('Manage Company Profile Clicked');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CompanyViewByCurrentUser()),
+                );
               },
               child: Text('Manage Company Profile'),
             ),

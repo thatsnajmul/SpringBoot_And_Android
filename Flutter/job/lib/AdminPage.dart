@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:job/LoginReg/Login.dart';
 import 'package:job/company/admin/AdminViewCompany.dart';
 import 'package:job/company/public/AddCompany.dart';
 import 'package:job/company/public/CarouselCompanyView.dart';
@@ -8,7 +6,6 @@ import 'package:job/company/public/ViewCompany.dart';
 import 'package:job/job-application/admin/AdminViewJobApplication.dart';
 import 'package:job/job-application/public/ViewJobApplication.dart';
 import 'package:job/job/admin/AdminViewJob.dart';
-import 'package:job/LoginReg/RegisterScreen.dart';
 import 'package:job/job/public/addJob.dart';
 
 class Adminpage extends StatefulWidget {
@@ -17,124 +14,88 @@ class Adminpage extends StatefulWidget {
 }
 
 class _AdminpageState extends State<Adminpage> {
-  String? role; // Track the user's role
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchUserRole(); // Fetch role from local storage
-  }
-
-  // Fetch user role from SharedPreferences
-  Future<void> _fetchUserRole() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      role = prefs.getString('role'); // e.g., "admin" or "user"
-    });
-    print("User role: $role"); // Debugging
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Drawer(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Admin Dashboard"),
+        backgroundColor: Colors.blueAccent,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // Go back to the previous screen
+          },
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Drawer Header Section
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                ),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.work,
-                    color: Colors.white,
-                    size: 50,
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    'Job Search',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+            // First Title
+            Text(
+              'Admin Actions - Jobs',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.blueAccent,
               ),
             ),
+            SizedBox(height: 16), // Spacing between title and grid
 
-            // Drawer Items Section
+            // First Grid - Jobs related actions
             Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10.0,
-                mainAxisSpacing: 10.0,
-                children: [
+              flex: 1,
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3, // 4 items per row
+                  crossAxisSpacing: 12.0,
+                  mainAxisSpacing: 12.0,
+                  childAspectRatio: 1.2, // Aspect ratio of the button items
+                ),
+                itemCount: 4, // Only 4 items for Jobs related actions
+                itemBuilder: (context, index) {
+                  return _buildDrawerItem(
+                    context,
+                    _getItemTitle(index),
+                    _getItemIcon(index),
+                    _getItemDestination(index),
+                  );
+                },
+              ),
+            ),
+            SizedBox(height: 20), // Space between the grids
 
-                  Text("For Job"),
-                  // Common Items for All Users
-                  _buildDrawerItem(
-                    context,
-                    'Add Job',
-                    Icons.add,
-                    AddJob(),
-                  ),
-                  _buildDrawerItem(
-                    context,
-                    'View Job',
-                    Icons.visibility,
-                    AdminViewJob(), // Or a common ViewJob if needed
-                  ),
+            // Second Title
+            Text(
+              'Admin Actions - Companies',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.blueAccent,
+              ),
+            ),
+            SizedBox(height: 16), // Spacing between title and grid
 
-                  Text("For Job Application"),
-                  _buildDrawerItem(
+            // Second Grid - Company related actions
+            Expanded(
+              flex: 1,
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3, // 4 items per row
+                  crossAxisSpacing: 12.0,
+                  mainAxisSpacing: 12.0,
+                  childAspectRatio: 1.2, // Aspect ratio of the button items
+                ),
+                itemCount: 4, // Only 4 items for Company related actions
+                itemBuilder: (context, index) {
+                  return _buildDrawerItem(
                     context,
-                    'View',
-                    Icons.library_books,
-                    ViewJobApplication(),
-                  ),
-                  // Admin-Only Items
-                  _buildDrawerItem(
-                    context,
-                    'Update & Delete',
-                    Icons.admin_panel_settings,
-                    AdminViewJobApplications(),
-                  ),
-
-                  Text("For Company"),
-                  _buildDrawerItem(
-                    context,
-                    'Add',
-                    Icons.business,
-                    AddCompany(),
-                  ),
-                  _buildDrawerItem(
-                    context,
-                    'View',
-                    Icons.business_outlined,
-                    ViewCompany(),
-                  ),
-                  _buildDrawerItem(
-                    context,
-                    'Update & Delete',
-                    Icons.business_outlined,
-                    AdminViewCompany(),
-                  ),
-                  _buildDrawerItem(
-                    context,
-                    'Carousel Company View',
-                    Icons.view_carousel,
-                    CarouselCompanyView(),
-                  ),
-                ],
+                    _getItemTitle(index + 4), // Skipping the first 4 for the second section
+                    _getItemIcon(index + 4), // Skipping the first 4 for the second section
+                    _getItemDestination(index + 4), // Skipping the first 4 for the second section
+                  );
+                },
               ),
             ),
           ],
@@ -143,33 +104,112 @@ class _AdminpageState extends State<Adminpage> {
     );
   }
 
-  // Helper method to create Grid items for each navigation option
+  // Helper method to get the title for each item based on the index
+  String _getItemTitle(int index) {
+    switch (index) {
+      case 0:
+        return 'Add Job';
+      case 1:
+        return 'View Job';
+      case 2:
+        return 'View Job Application';
+      case 3:
+        return 'Add Company';
+      case 4:
+        return 'View Company';
+      case 5:
+        return 'Manage Job Applications';
+      case 6:
+        return 'Manage Companies';
+      case 7:
+        return 'Carousel View';
+      default:
+        return '';
+    }
+  }
+
+  // Helper method to get the icon for each item based on the index
+  IconData _getItemIcon(int index) {
+    switch (index) {
+      case 0:
+        return Icons.add;
+      case 1:
+        return Icons.visibility;
+      case 2:
+        return Icons.library_books;
+      case 3:
+        return Icons.business;
+      case 4:
+        return Icons.business_outlined;
+      case 5:
+        return Icons.admin_panel_settings;
+      case 6:
+        return Icons.business_outlined;
+      case 7:
+        return Icons.view_carousel;
+      default:
+        return Icons.help;
+    }
+  }
+
+  // Helper method to get the destination widget for each item based on the index
+  Widget _getItemDestination(int index) {
+    switch (index) {
+      case 0:
+        return AddJob();
+      case 1:
+        return AdminViewJob();
+      case 2:
+        return ViewJobApplication();
+      case 3:
+        return AddCompany();
+      case 4:
+        return ViewCompany();
+      case 5:
+        return AdminViewJobApplications();
+      case 6:
+        return AdminViewCompany();
+      case 7:
+        return CarouselCompanyView();
+      default:
+        return AddJob(); // Default fallback
+    }
+  }
+
+  // Helper method to create each grid item
   Widget _buildDrawerItem(BuildContext context, String title, IconData icon, Widget destination) {
     return GestureDetector(
       onTap: () {
-        Navigator.pop(context); // Close the drawer
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => destination),
         );
       },
       child: Card(
-        elevation: 5.0,
+        elevation: 8.0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15.0),
         ),
         child: Container(
-          padding: EdgeInsets.all(10.0),
+          padding: EdgeInsets.all(12.0),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(15.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.3),
+                spreadRadius: 1,
+                blurRadius: 5,
+                offset: Offset(0, 3), // changes position of shadow
+              ),
+            ],
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
                 icon,
-                color: Colors.blue,
+                color: Colors.blueAccent,
                 size: 40.0,
               ),
               SizedBox(height: 10),
@@ -177,9 +217,9 @@ class _AdminpageState extends State<Adminpage> {
                 title,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.blue,
+                  color: Colors.blueAccent,
                   fontWeight: FontWeight.bold,
-                  fontSize: 14.0,
+                  fontSize: 12.0,
                 ),
               ),
             ],

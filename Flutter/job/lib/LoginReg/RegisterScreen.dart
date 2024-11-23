@@ -59,6 +59,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         print('Registration successful!');
+        // Navigate to Login Page
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()), // Adjust this import if needed
+        );
       } else if (response.statusCode == 409) {
         print('User already exists!');
       } else {
@@ -66,6 +71,43 @@ class _RegistrationPageState extends State<RegistrationPage> {
       }
     }
   }
+
+  // void _register() async {
+  //   if (_formKey.currentState!.validate()) {
+  //     String uName = name.text;
+  //     String uEmail = email.text;
+  //     String uPassword = password.text;
+  //     String uCell = cell.text;
+  //     String uAddress = address.text;
+  //     String uGender = selectedGender ?? 'Other';
+  //     String uDob = selectedDOB != null ? selectedDOB!.toIso8601String() : '';
+  //     String uRole = selectedRole ?? 'JOB_SEEKER';
+  //
+  //     // Determine the registration URL based on the role
+  //     String url;
+  //     if (uRole == 'JOB_SEEKER') {
+  //       url = 'http://localhost:8080/register/job-seeker';
+  //     } else if (uRole == 'EMPLOYER') {
+  //       url = 'http://localhost:8080/register/employer';
+  //     } else if (uRole == 'ADMIN') {
+  //       url = 'http://localhost:8080/register/admin';
+  //     } else {
+  //       url = 'http://localhost:8080/register/job-seeker';
+  //     }
+  //
+  //     // Send data to the server
+  //     final response = await _sendDataToBackend(
+  //         url, uName, uEmail, uPassword, uCell, uAddress, uGender, uDob);
+  //
+  //     if (response.statusCode == 201 || response.statusCode == 200) {
+  //       print('Registration successful!');
+  //     } else if (response.statusCode == 409) {
+  //       print('User already exists!');
+  //     } else {
+  //       print('Registration failed with status: ${response.statusCode}');
+  //     }
+  //   }
+  // }
 
   // HTTP POST Request to send data to backend
   Future<http.Response> _sendDataToBackend(

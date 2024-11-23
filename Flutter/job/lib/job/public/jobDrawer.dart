@@ -113,7 +113,7 @@ class JobDrawer extends StatelessWidget {
                   ),
                   _buildDrawerItem(
                     context,
-                    'Carosel Company View',
+                    'Carousel Company View',
                     Icons.view_carousel,
                     CarouselCompanyView(),
                   ),

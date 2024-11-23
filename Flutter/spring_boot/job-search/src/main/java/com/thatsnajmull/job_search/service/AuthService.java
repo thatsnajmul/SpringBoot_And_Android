@@ -64,7 +64,7 @@ public class AuthService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(Role.valueOf("JOB_SEEKER"));
-        user.setLock(false);
+        user.setLock(true);
         user.setActive(false);
 
         userRepository.save(user);
@@ -91,7 +91,7 @@ public class AuthService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(Role.valueOf("ADMIN"));
-        user.setLock(false);
+        user.setLock(true);
         user.setActive(false);
 
         userRepository.save(user);
@@ -117,7 +117,7 @@ public class AuthService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(Role.valueOf("EMPLOYER"));
-        user.setLock(false);
+        user.setLock(true);
         user.setActive(false);
 
         userRepository.save(user);

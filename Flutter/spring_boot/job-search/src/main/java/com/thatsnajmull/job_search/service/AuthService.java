@@ -132,86 +132,6 @@ public class AuthService {
         return new AuthenticationResponse(jwt, "User registration was successful", null);
     }
 
-
-//    public AuthenticationResponse registerJobSeeker(User user) {
-//
-//        // Check if the user already exists
-//        if (userRepository.findByEmail(user.getUsername()).isPresent()) {
-//            return new AuthenticationResponse(null, "User already exists");
-//        }
-//
-//        // Create a new user entity and save it to the database
-//
-//        user.setPassword(passwordEncoder.encode(user.getPassword()));
-//        user.setRole(Role.valueOf("JOB_SEEKER"));
-//        user.setLock(true);
-//        user.setActive(false);
-//
-//        userRepository.save(user);
-//
-//        // Generate JWT token for the newly registered user
-//        String jwt = jwtService.generateToken(user);
-//
-//        // Save the token to the token repository
-//        saveUserToken(jwt, user);
-//        sendActivationEmail(user);
-//
-//        return new AuthenticationResponse(jwt, "User registration was successful");
-//    }
-//
-//
-//    public AuthenticationResponse registerAdmin(User user) {
-//
-//        // Check if the user already exists
-//        if (userRepository.findByEmail(user.getUsername()).isPresent()) {
-//            return new AuthenticationResponse(null, "User already exists");
-//        }
-//
-//        // Create a new user entity and save it to the database
-//
-//        user.setPassword(passwordEncoder.encode(user.getPassword()));
-//        user.setRole(Role.valueOf("ADMIN"));
-//        user.setLock(true);
-//        user.setActive(false);
-//
-//        userRepository.save(user);
-//
-//        // Generate JWT token for the newly registered user
-//        String jwt = jwtService.generateToken(user);
-//
-//        // Save the token to the token repository
-//        saveUserToken(jwt, user);
-//        sendActivationEmail(user);
-//
-//        return new AuthenticationResponse(jwt, "User registration was successful");
-//    }
-//
-//    public AuthenticationResponse registerEmployer(User user) {
-//
-//        // Check if the user already exists
-//        if (userRepository.findByEmail(user.getUsername()).isPresent()) {
-//            return new AuthenticationResponse(null, "User already exists");
-//        }
-//
-//        // Create a new user entity and save it to the database
-//
-//        user.setPassword(passwordEncoder.encode(user.getPassword()));
-//        user.setRole(Role.valueOf("EMPLOYER"));
-//        user.setLock(false);
-//        user.setActive(false);
-//
-//        userRepository.save(user);
-//
-//        // Generate JWT token for the newly registered user
-//        String jwt = jwtService.generateToken(user);
-//
-//        // Save the token to the token repository
-//        saveUserToken(jwt, user);
-//        sendActivationEmail(user);
-//
-//        return new AuthenticationResponse(jwt, "User registration was successful");
-//    }
-
     // Method to authenticate a user
     public AuthenticationResponse authenticate(User request) {
 
@@ -250,19 +170,6 @@ public class AuthService {
                  "Regards, Job Portal";
 
         String subject = "Confirm User Account";
-
-//        String mailText = "<h3>Dear " + user.getName() + ",</h3>"
-//                + "<p>Please click on the following link to confirm your account:</p>"
-//                + "<a href=\"" + activationLink + "\">Activate Account</a>"
-//                + "<br><br>Regards,<br>Job Portal";
-//
-//        String subject = "Confirm User Account";
-
-//        MimeMessage message = mailSender.createMimeMessage();
-//        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-//        helper.setTo(user.getEmail());
-//        helper.setSubject(subject);
-//        helper.setText(mailText, true);  // Set true for HTML content
 
         try {
 

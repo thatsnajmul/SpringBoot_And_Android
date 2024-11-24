@@ -19,21 +19,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    // Get user by Email
-//    @GetMapping("/email/{email}")
-//    public ResponseEntity<User> getUserByEmail(@PathVariable String username) {
-//        Optional<User> user = userService.loadUserByUsername(username);
-//        return user.map(ResponseEntity::ok)
-//                .orElseGet(() -> ResponseEntity.notFound().build());
-//    }
-
-//    @GetMapping("/email/{email}")
-//    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
-//        Optional<User> user = userService.getUserByEmail(email);  // Use the new method here
-//        return user.map(ResponseEntity::ok)
-//                .orElseGet(() -> ResponseEntity.notFound().build());
-//    }
-
     // Get user by ID and return DTO
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable long id) {
@@ -50,16 +35,6 @@ public class UserController {
         UserDTO savedUserDTO = userService.convertToDTO(savedUser);
         return ResponseEntity.ok(savedUserDTO);
     }
-
-    // You can add more endpoints for different CRUD operations
-
-
-
-
-
-
-
-
 
     // Update user by Email
     @PutMapping("/email/{email}")

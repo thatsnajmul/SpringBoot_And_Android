@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _widgetOptions = <Widget>[
     ViewJob(), // View Jobs
     ViewCompany(), // View Companies
-    ProfilePage() // Profile
+    // ProfilePage() // Profile
   ];
 
   @override
@@ -139,10 +139,10 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.business),
             label: 'View Companies',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.person),
+          //   label: 'Profile',
+          // ),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.blue,

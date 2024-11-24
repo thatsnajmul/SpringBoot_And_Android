@@ -80,7 +80,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => Adminpage()),
+                    MaterialPageRoute(builder: (context) => AdminPage()),
                   );
                 },
                 icon: Icon(Icons.admin_panel_settings),

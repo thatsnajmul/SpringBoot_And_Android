@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:job/Profile.dart';
 import 'package:job/main.dart';
 import '../AdminPage.dart';
 import '../EmployerPage.dart';
@@ -31,12 +32,12 @@ class LoginPage extends StatelessWidget {
         if (role == 'ADMIN') {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => Adminpage()),
+            MaterialPageRoute(builder: (context) => ProfilePage()),
           );
         } else if (role == 'EMPLOYER') {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => EmployerPage()),
+            MaterialPageRoute(builder: (context) => ProfilePage()),
           );
         } else if (role == 'JOB_SEEKER') {
           Navigator.pushReplacement(

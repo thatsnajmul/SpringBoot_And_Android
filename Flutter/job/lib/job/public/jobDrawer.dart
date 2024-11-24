@@ -102,6 +102,12 @@ class _JobDrawerState extends State<JobDrawer> {
                   ),
                   _buildDrawerItem(
                     context,
+                    'View Applications',
+                    Icons.admin_panel_settings,
+                    ViewJobApplication(),
+                  ),
+                  _buildDrawerItem(
+                    context,
                     'Admin Companies',
                     Icons.business_center,
                     AdminViewCompany(),

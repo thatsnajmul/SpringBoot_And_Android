@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:job/company/public/AddCompany.dart';
 import 'package:job/job/admin/AdminViewJob.dart';
 import 'package:job/job-application/admin/AdminViewJobApplication.dart';
 import 'package:job/company/admin/AdminViewCompany.dart';
+import 'package:job/job/public/addJob.dart';
+import 'package:job/reports_page.dart';
+
+import 'UserManagementPage.dart';
 
 class AdminPage extends StatelessWidget {
   @override
@@ -36,6 +41,12 @@ class AdminPage extends StatelessWidget {
                 children: [
                   _buildAdminFeature(
                     context,
+                    title: 'Add Jobs',
+                    icon: Icons.add,
+                    destination: AddJob(),
+                  ),
+                  _buildAdminFeature(
+                    context,
                     title: 'Manage Jobs',
                     icon: Icons.work,
                     destination: AdminViewJob(),
@@ -45,6 +56,12 @@ class AdminPage extends StatelessWidget {
                     title: 'View Applications',
                     icon: Icons.assignment,
                     destination: AdminViewJobApplications(),
+                  ),
+                  _buildAdminFeature(
+                    context,
+                    title: 'Add Company',
+                    icon: Icons.add,
+                    destination: AddCompany(),
                   ),
                   _buildAdminFeature(
                     context,
@@ -62,13 +79,13 @@ class AdminPage extends StatelessWidget {
                     context,
                     title: 'Reports',
                     icon: Icons.analytics,
-                    destination: PlaceholderWidget('Reports Page'),
+                    destination: ReportsPage(),
                   ),
                   _buildAdminFeature(
                     context,
                     title: 'User Management',
                     icon: Icons.people,
-                    destination: PlaceholderWidget('User Management Page'),
+                    destination: UserManagementPage(),
                   ),
                 ],
               ),

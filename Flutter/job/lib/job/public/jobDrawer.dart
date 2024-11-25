@@ -90,6 +90,12 @@ class _JobDrawerState extends State<JobDrawer> {
                 if (userRole == 'ADMIN') ...[
                   _buildDrawerItem(
                     context,
+                    'Add Job',
+                    Icons.add,
+                    AddJob(),
+                  ),
+                  _buildDrawerItem(
+                    context,
                     'Admin Jobs',
                     Icons.work,
                     AdminViewJob(),
@@ -105,6 +111,12 @@ class _JobDrawerState extends State<JobDrawer> {
                     'View Applications',
                     Icons.admin_panel_settings,
                     ViewJobApplication(),
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    'Add Companies',
+                    Icons.add,
+                    AddCompany(),
                   ),
                   _buildDrawerItem(
                     context,
